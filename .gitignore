@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+*.orig.*
+
+# Native
+ios/
+android/
+
+# Metro
+.metro-health-check*
+
+# Debug / logs
+npm-debug.*
+*.log
+
+# Env
+.env*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local QA
+.preview/

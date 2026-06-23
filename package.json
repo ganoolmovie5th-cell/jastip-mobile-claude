@@ -1,0 +1,27 @@
+{
+  "name": "jastip-mobile-claude",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~55.0.26",
+    "expo-status-bar": "~55.0.6",
+    "react": "19.2.0",
+    "react-native": "0.83.6",
+    "@react-navigation/native": "^7.1.6",
+    "@react-navigation/bottom-tabs": "^7.3.10",
+    "@react-navigation/native-stack": "^7.3.10",
+    "react-native-screens": "~4.23.0",
+    "react-native-safe-area-context": "~5.6.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "babel-preset-expo": "~55.0.22"
+  },
+  "private": true
+}
