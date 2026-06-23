@@ -46,6 +46,7 @@ function HomeStack() {
     headerShadowVisible: false,
     headerTintColor: colors.ink,
     headerTitleStyle: { fontWeight: "800" },
+    headerBackButtonDisplayMode: "generic",
     contentStyle: { backgroundColor: colors.bg },
   };
   return (
@@ -54,7 +55,7 @@ function HomeStack() {
       <Stack.Screen
         name="Notifications"
         component={NotificationsScreen}
-        options={{ title: t("nav.notifications"), headerBackTitle: t("tab.home") }}
+        options={{ title: t("nav.notifications") }}
       />
     </Stack.Navigator>
   );
@@ -67,6 +68,7 @@ function CategoriesStack() {
     headerShadowVisible: false,
     headerTintColor: colors.ink,
     headerTitleStyle: { fontWeight: "800" },
+    headerBackButtonDisplayMode: "generic",
     contentStyle: { backgroundColor: colors.bg },
   };
   return (
@@ -88,16 +90,13 @@ function ProfileStack() {
     headerShadowVisible: false,
     headerTintColor: colors.ink,
     headerTitleStyle: { fontWeight: "800" },
+    headerBackButtonDisplayMode: "generic",
     contentStyle: { backgroundColor: colors.bg },
   };
   return (
     <Stack.Navigator screenOptions={screenOpts}>
       <Stack.Screen name="ProfileHome" component={ProfileScreen} options={{ headerShown: false }} />
-      <Stack.Screen
-        name="Login"
-        component={LoginScreen}
-        options={{ title: t("nav.login"), headerBackTitle: t("tab.profile") }}
-      />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ title: t("nav.login") }} />
       <Stack.Screen name="Orders" component={OrdersScreen} options={{ title: t("nav.orders") }} />
       <Stack.Screen name="OrderDetail" component={OrderDetailScreen} options={{ title: t("nav.order_detail") }} />
       <Stack.Screen name="Address" component={AddressScreen} options={{ title: t("nav.address") }} />
