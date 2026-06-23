@@ -1,10 +1,11 @@
 // Auth context: login Gmail lewat OAuth (expo-auth-session), kompatibel Expo Go.
-// Tanpa modul native kustom. Sesi pengguna disimpan lokal di AsyncStorage.
+// Menggunakan AuthSession.useAuthRequest langsung (bukan Google provider)
+// agar redirectUri tidak di-override oleh SDK.
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { Alert } from "react-native";
 import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
+import * as AuthSession from "expo-auth-session";
 import { GOOGLE_CLIENT_IDS, isGoogleConfigured } from "./googleConfig";
 import { loadJSON, saveJSON, removeKey, STORAGE_KEYS } from "../storage";
 
@@ -12,10 +13,17 @@ WebBrowser.maybeCompleteAuthSession();
 
 const AuthContext = createContext(null);
 
-// Redirect URI untuk Expo Go — harus HTTPS, bukan exp://
-// URI ini wajib didaftarkan di Google Cloud Console → OAuth Client (Web Application)
+// Redirect URI eksplisit — harus HTTPS agar diterima Google.
+// Wajib terdaftar di Google Cloud Console → Web Application client
 // → Authorized redirect URIs
 const REDIRECT_URI = "https://auth.expo.io/@ganoolmovie5th/jastip-mobile-claude";
+
+// Discovery document Google OAuth 2.0
+const GOOGLE_DISCOVERY = {
+  authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
+  tokenEndpoint: "https://oauth2.googleapis.com/token",
+  revocationEndpoint: "https://oauth2.googleapis.com/revoke",
+};
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -24,15 +32,22 @@ export function AuthProvider({ children }) {
 
   const configured = isGoogleConfigured();
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    webClientId: GOOGLE_CLIENT_IDS.web,
-    androidClientId: GOOGLE_CLIENT_IDS.android,
-    iosClientId: GOOGLE_CLIENT_IDS.ios,
-    redirectUri: REDIRECT_URI,
-    scopes: ["profile", "email"],
-  });
+  // Pakai AuthSession.useAuthRequest langsung agar redirectUri tidak di-override
+  const [request, response, promptAsync] = AuthSession.useAuthRequest(
+    {
+      clientId: GOOGLE_CLIENT_IDS.web,
+      redirectUri: REDIRECT_URI,
+      scopes: ["profile", "email"],
+      responseType: AuthSession.ResponseType.Token,
+      usePKCE: false,
+      extraParams: {
+        access_type: "online",
+      },
+    },
+    GOOGLE_DISCOVERY
+  );
 
-  // Pulihkan sesi tersimpan saat aplikasi dibuka.
+  // Pulihkan sesi tersimpan saat aplikasi dibuka
   useEffect(() => {
     (async () => {
       const saved = await loadJSON(STORAGE_KEYS.user, null);
@@ -41,14 +56,25 @@ export function AuthProvider({ children }) {
     })();
   }, []);
 
-  // Tangani hasil OAuth.
+  // Tangani hasil OAuth
   useEffect(() => {
     if (!response) return;
     if (response.type === "success") {
-      const token = response.authentication?.accessToken;
-      if (token) fetchProfile(token);
-      else setSigningIn(false);
-    } else if (response.type === "error" || response.type === "dismiss" || response.type === "cancel") {
+      // Implicit flow: token ada di params atau authentication
+      const token =
+        response.authentication?.accessToken ||
+        response.params?.access_token;
+      if (token) {
+        fetchProfile(token);
+      } else {
+        setSigningIn(false);
+        Alert.alert("Login gagal", "Token tidak diterima dari Google. Coba lagi ya.");
+      }
+    } else if (
+      response.type === "error" ||
+      response.type === "dismiss" ||
+      response.type === "cancel"
+    ) {
       setSigningIn(false);
     }
   }, [response]);
@@ -80,7 +106,7 @@ export function AuthProvider({ children }) {
     if (!configured) {
       Alert.alert(
         "Login Google belum aktif",
-        "Client ID Google belum diisi di src/auth/googleConfig.js. Ikuti petunjuk di file itu untuk mengaktifkan login Gmail."
+        "Client ID Google belum diisi di src/auth/googleConfig.js."
       );
       return;
     }
