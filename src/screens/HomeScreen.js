@@ -8,6 +8,7 @@ import {
   Image,
   Pressable,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,9 +18,13 @@ import { categories, steps, stats, testimonial } from "../data";
 import Button from "../components/Button";
 import SectionHeader from "../components/SectionHeader";
 import { openWhatsApp } from "../whatsapp";
+import { useAuth } from "../auth/AuthContext";
 
 export default function HomeScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const { isSignedIn, user, signInWithGoogle, signingIn } = useAuth();
+
+  const firstName = (user?.name || "").trim().split(/\s+/)[0];
 
   const goToCategory = (cat) =>
     navigation.navigate("Kategori", {
@@ -48,7 +53,9 @@ export default function HomeScreen({ navigation }) {
 
       {/* Greeting + search */}
       <View style={styles.pad}>
-        <Text style={styles.greeting}>Mau titip apa hari ini?</Text>
+        <Text style={styles.greeting}>
+          {isSignedIn && firstName ? `Halo, ${firstName} 👋` : "Mau titip apa hari ini?"}
+        </Text>
         <View style={styles.search}>
           <Ionicons name="search-outline" size={18} color={colors.muted} />
           <TextInput
@@ -58,6 +65,37 @@ export default function HomeScreen({ navigation }) {
           />
         </View>
       </View>
+
+      {/* Ajakan login Google (hanya saat belum masuk) */}
+      {!isSignedIn ? (
+        <View style={[styles.pad, { marginTop: spacing.md }]}>
+          <View style={styles.signinCard}>
+            <View style={styles.signinHead}>
+              <View style={styles.signinMark}>
+                <Ionicons name="person-circle-outline" size={22} color={colors.brand} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.signinTitle}>Masuk biar lebih cepat</Text>
+                <Text style={styles.signinDesc}>Simpan pesanan, alamat, dan pembayaran otomatis.</Text>
+              </View>
+            </View>
+            <Pressable
+              onPress={signInWithGoogle}
+              disabled={signingIn}
+              style={({ pressed }) => [styles.googleBtn, pressed && { opacity: 0.9 }, signingIn && { opacity: 0.7 }]}
+            >
+              {signingIn ? (
+                <ActivityIndicator color={colors.ink} />
+              ) : (
+                <>
+                  <Ionicons name="logo-google" size={19} color="#ea4335" />
+                  <Text style={styles.googleText}>Lanjut dengan Google</Text>
+                </>
+              )}
+            </Pressable>
+          </View>
+        </View>
+      ) : null}
 
       {/* Hero */}
       <View style={[styles.pad, { marginTop: spacing.md }]}>
@@ -296,4 +334,36 @@ const styles = StyleSheet.create({
   avaText: { color: colors.brand, fontWeight: "800", fontSize: 14 },
   quoteName: { fontSize: 14, fontWeight: "700", color: colors.ink },
   quoteCity: { fontSize: 12.5, color: colors.muted },
+  signinCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.line,
+    padding: spacing.md,
+    ...shadow.card,
+  },
+  signinHead: { flexDirection: "row", alignItems: "center", gap: 12 },
+  signinMark: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: colors.brandSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  signinTitle: { fontSize: 15, fontWeight: "800", color: colors.ink },
+  signinDesc: { fontSize: 12.5, color: colors.muted, marginTop: 3, lineHeight: 18 },
+  googleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    backgroundColor: colors.bg,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    borderColor: colors.line,
+    paddingVertical: 13,
+    marginTop: spacing.md,
+  },
+  googleText: { fontSize: 15, fontWeight: "700", color: colors.ink },
 });
