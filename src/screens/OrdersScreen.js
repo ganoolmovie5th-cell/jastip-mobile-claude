@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, radius, spacing, shadow } from "../theme";
-import { myOrders, orderStatusMeta, formatRupiah } from "../data";
+import { myOrders, orderStatusMeta, formatRupiah, ORDER_TOTAL_STEPS, orderTotal } from "../data";
 import Button from "../components/Button";
 import { useAuth } from "../auth/AuthContext";
 import { openWhatsApp } from "../whatsapp";
@@ -77,7 +77,7 @@ export default function OrdersScreen({ navigation }) {
         </View>
       ) : (
         orders.map((o) => {
-          const total = o.itemPrice + o.serviceFee + o.shipping;
+          const total = orderTotal(o);
           return (
             <View key={o.id} style={styles.card}>
               <View style={styles.cardTop}>
@@ -96,11 +96,11 @@ export default function OrdersScreen({ navigation }) {
                 <View style={styles.progressWrap}>
                   <View style={styles.progressTrack}>
                     <View
-                      style={[styles.progressFill, { width: `${(o.currentStep / o.steps) * 100}%` }]}
+                      style={[styles.progressFill, { width: `${(o.currentStep / ORDER_TOTAL_STEPS) * 100}%` }]}
                     />
                   </View>
                   <Text style={styles.progressText}>
-                    Tahap {o.currentStep} dari {o.steps}
+                    Tahap {o.currentStep} dari {ORDER_TOTAL_STEPS}
                   </Text>
                 </View>
               ) : null}
@@ -115,7 +115,7 @@ export default function OrdersScreen({ navigation }) {
                   onPress={() =>
                     o.status === "selesai"
                       ? openWhatsApp(`Halo Jastipin, saya mau pesan lagi seperti ${o.id}`)
-                      : navigation.navigate("Lacak")
+                      : navigation.navigate("Lacak", { orderId: o.id })
                   }
                 >
                   <Text style={styles.detailBtnText}>

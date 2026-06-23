@@ -46,9 +46,22 @@ export default function HomeScreen({ navigation }) {
           </View>
           <Text style={styles.brandName}>Jastipin</Text>
         </View>
-        <Pressable style={styles.bell} hitSlop={8}>
-          <Ionicons name="notifications-outline" size={22} color={colors.ink} />
-        </Pressable>
+        <View style={styles.topRight}>
+          <Pressable style={styles.bell} hitSlop={8}>
+            <Ionicons name="notifications-outline" size={22} color={colors.ink} />
+          </Pressable>
+          {isSignedIn ? (
+            <Pressable hitSlop={8} onPress={() => navigation.navigate("Profil")}>
+              {user?.picture ? (
+                <Image source={{ uri: user.picture }} style={styles.topAva} />
+              ) : (
+                <View style={[styles.topAva, styles.topAvaFallback]}>
+                  <Text style={styles.topAvaText}>{(firstName?.[0] || "J").toUpperCase()}</Text>
+                </View>
+              )}
+            </Pressable>
+          ) : null}
+        </View>
       </View>
 
       {/* Greeting + search */}
@@ -353,6 +366,10 @@ const styles = StyleSheet.create({
   },
   signinTitle: { fontSize: 15, fontWeight: "800", color: colors.ink },
   signinDesc: { fontSize: 12.5, color: colors.muted, marginTop: 3, lineHeight: 18 },
+  topRight: { flexDirection: "row", alignItems: "center", gap: 12 },
+  topAva: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.tint },
+  topAvaFallback: { backgroundColor: colors.brand, alignItems: "center", justifyContent: "center" },
+  topAvaText: { color: colors.white, fontWeight: "800", fontSize: 14 },
   googleBtn: {
     flexDirection: "row",
     alignItems: "center",

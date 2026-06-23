@@ -68,21 +68,14 @@ export const testimonial = {
   initials: "RP",
 };
 
-// Pesanan contoh untuk layar Lacak
-export const sampleOrder = {
-  code: "JTP-204815",
-  item: "Serum hyaluronic + cushion compact",
-  origin: "Seoul, Korea Selatan",
-  eta: "2 hari lagi",
-  currentStep: 3,
-  timeline: [
-    { id: 1, title: "Pesanan dikonfirmasi", date: "12 Jun, 09:20", done: true },
-    { id: 2, title: "Dibelanjakan personal shopper", date: "12 Jun, 16:05", done: true },
-    { id: 3, title: "Dikirim dari luar negeri", date: "14 Jun, 11:30", done: true },
-    { id: 4, title: "Tiba di gudang Indonesia", date: "Estimasi 24 Jun", done: false },
-    { id: 5, title: "Diantar ke alamat kamu", date: "Estimasi 25 Jun", done: false },
-  ],
-};
+// Tahapan pesanan, dipakai bersama oleh layar "Pesanan saya" dan "Lacak".
+export const ORDER_STAGES = [
+  "Pesanan dikonfirmasi",
+  "Dibelanjakan personal shopper",
+  "Dikirim dari luar negeri",
+  "Tiba di gudang Indonesia",
+  "Diantar ke alamat kamu",
+];
 
 export const profileMenu = [
   { id: "orders", label: "Pesanan saya", icon: "bag-handle-outline", route: "Orders" },
@@ -92,8 +85,9 @@ export const profileMenu = [
   { id: "about", label: "Tentang Jastipin", icon: "information-circle-outline", route: "About" },
 ];
 
-// Pesanan contoh untuk layar "Pesanan saya".
+// Sumber tunggal data pesanan (dipakai layar "Pesanan saya" DAN "Lacak").
 // Status: diproses | dikirim | selesai | dibatalkan
+// stageDates sejajar dengan ORDER_STAGES; status "done" dihitung dari currentStep.
 export const myOrders = [
   {
     id: "JTP-204815",
@@ -105,8 +99,9 @@ export const myOrders = [
     itemPrice: 770000,
     serviceFee: 75000,
     shipping: 95000,
-    steps: 5,
     currentStep: 3,
+    eta: "2 hari lagi",
+    stageDates: ["12 Jun, 09:20", "12 Jun, 16:05", "14 Jun, 11:30", "Estimasi 24 Jun", "Estimasi 25 Jun"],
   },
   {
     id: "JTP-203190",
@@ -118,8 +113,9 @@ export const myOrders = [
     itemPrice: 2450000,
     serviceFee: 180000,
     shipping: 210000,
-    steps: 5,
     currentStep: 5,
+    eta: null,
+    stageDates: ["26 Mei, 10:00", "26 Mei, 18:20", "28 Mei, 09:15", "1 Jun, 14:40", "4 Jun, 11:05"],
   },
   {
     id: "JTP-205622",
@@ -131,8 +127,9 @@ export const myOrders = [
     itemPrice: 3200000,
     serviceFee: 220000,
     shipping: 240000,
-    steps: 5,
     currentStep: 1,
+    eta: "Sedang diproses",
+    stageDates: ["20 Jun, 10:15", "Estimasi 22 Jun", "Estimasi 25 Jun", "Estimasi 2 Jul", "Estimasi 4 Jul"],
   },
   {
     id: "JTP-201044",
@@ -144,8 +141,9 @@ export const myOrders = [
     itemPrice: 240000,
     serviceFee: 35000,
     shipping: 80000,
-    steps: 5,
     currentStep: 5,
+    eta: null,
+    stageDates: ["3 Mei, 08:30", "3 Mei, 15:10", "5 Mei, 12:00", "9 Mei, 16:25", "11 Mei, 10:40"],
   },
 ];
 
@@ -155,6 +153,30 @@ export const orderStatusMeta = {
   selesai: { label: "Selesai", color: "#2f7d4f", soft: "#e3f1e8", icon: "checkmark-done-outline" },
   dibatalkan: { label: "Dibatalkan", color: "#b3261e", soft: "#f7e2e0", icon: "close-circle-outline" },
 };
+
+// Total tahapan (dipakai progress bar di "Pesanan saya" dan timeline di "Lacak").
+export const ORDER_TOTAL_STEPS = ORDER_STAGES.length;
+
+// Ambil satu pesanan berdasarkan kode.
+export function getOrderById(id) {
+  return myOrders.find((o) => o.id === id) || null;
+}
+
+// Bentuk timeline lengkap dari satu pesanan (status "done" dihitung dari currentStep).
+export function buildTimeline(order) {
+  if (!order) return [];
+  return ORDER_STAGES.map((title, i) => ({
+    id: i + 1,
+    title,
+    date: order.stageDates?.[i] || (i < order.currentStep ? "Selesai" : "Menunggu"),
+    done: i < order.currentStep,
+  }));
+}
+
+// Hitung total biaya satu pesanan.
+export function orderTotal(order) {
+  return order.itemPrice + order.serviceFee + order.shipping;
+}
 
 // Alamat awal (contoh). Pengguna bisa tambah / ubah / hapus, tersimpan di perangkat.
 export const seedAddresses = [
