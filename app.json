@@ -2,6 +2,7 @@
   "expo": {
     "name": "Jastipin",
     "slug": "jastip-mobile-claude",
+    "owner": "ganoolmovie5th",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
