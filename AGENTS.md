@@ -9,7 +9,7 @@ Aplikasi mobile **Expo + React Native** untuk layanan jasa titip (jastip) belanj
 ## Prinsip yang tidak boleh dilanggar
 
 1. **Harus tetap jalan di Expo Go.** Jangan menambah modul native kustom yang butuh dev build (mis. paket dengan kode native di luar Expo SDK). Pakai paket dari Expo SDK, React Navigation, dan JS murni saja.
-2. **Kunci versi ke satu Expo SDK.** Proyek ini di SDK 55. Kalau menambah paket, pakai `npx expo install <paket>` supaya versinya cocok dengan SDK, jangan `npm install` versi sembarang.
+2. **Kunci versi ke satu Expo SDK.** Proyek ini di SDK 54 (cocok dengan Expo Go 54.x di store). Kalau menambah paket, pakai `npx expo install <paket>` supaya versinya cocok dengan SDK, jangan `npm install` versi sembarang.
 3. **Kepercayaan di atas segalanya.** Setiap fitur atau copy harus memperkuat transparansi harga, bukti proses, dan kemudahan kontak.
 4. **Bahasa Indonesia natural** untuk semua teks pengguna. Tanpa em-dash.
 5. **Satu sistem desain.** Token ada di `src/theme.js` (teal, aksen oranye, krem). Jangan hardcode warna di luar theme.

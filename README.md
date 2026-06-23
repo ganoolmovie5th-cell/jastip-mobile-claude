@@ -4,7 +4,7 @@ Aplikasi mobile untuk layanan **jasa titip (jastip)** belanja, dibangun dengan *
 
 ## Cara menjalankan di Expo Go
 
-> Penting: proyek ini memakai **Expo SDK 55**. Pastikan aplikasi **Expo Go** di HP kamu mendukung SDK 55 (versi yang ada di App Store / Play Store saat ini).
+> Penting: proyek ini memakai **Expo SDK 54** supaya cocok dengan Expo Go versi 54.x yang ada di App Store / Play Store. Jangan naikkan ke SDK 55/56 selama Expo Go di HP kamu masih versi 54.
 
 ```bash
 # 1. Pasang dependensi
@@ -37,7 +37,7 @@ Tombol titip dan kontak membuka **WhatsApp** lewat deep link.
 
 ## Tech stack
 
-- Expo SDK 55 (React Native 0.83, React 19.2)
+- Expo SDK 54 (React Native 0.81, React 19.1)
 - React Navigation 7 (bottom tabs + native stack)
 - `@expo/vector-icons` (Ionicons), tanpa modul native kustom (kompatibel Expo Go)
 - JavaScript murni, tanpa TypeScript

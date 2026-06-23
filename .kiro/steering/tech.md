@@ -2,7 +2,7 @@
 
 ## Stack
 
-- **Expo SDK 55** (managed workflow), **React Native 0.83**, **React 19.2**.
+- **Expo SDK 54** (managed workflow), **React Native 0.81**, **React 19.1**.
 - **React Navigation 7**: `@react-navigation/native`, `bottom-tabs`, `native-stack`, dengan `react-native-screens` dan `react-native-safe-area-context`.
 - Ikon: `@expo/vector-icons` (Ionicons), ikut dengan paket `expo`.
 - JavaScript murni (bukan TypeScript). Entry `index.js` -> `App.js`.
@@ -10,8 +10,8 @@
 ## Aturan kompatibilitas Expo Go (kritis)
 
 - **Jangan tambah modul native kustom** yang butuh dev build. Hanya paket Expo SDK, React Navigation, dan JS murni.
-- Tambah paket selalu dengan `npx expo install <paket>` agar versinya cocok dengan SDK 55. Jangan `npm install` versi bebas untuk paket ekosistem RN/Expo.
-- Kalau perlu ganti SDK, ubah `expo` di `package.json`, lalu `npx expo install --fix` untuk menyelaraskan semua dependensi.
+- Tambah paket selalu dengan `npx expo install <paket>` agar versinya cocok dengan SDK 54. Jangan `npm install` versi bebas untuk paket ekosistem RN/Expo.
+- Kunci ke SDK 54 selama Expo Go di store masih versi 54.x. Kalau perlu ganti SDK, ubah `expo` di `package.json`, lalu `npx expo install --fix` untuk menyelaraskan semua dependensi.
 
 ## Design system (sumber kebenaran: `src/theme.js`)
 
