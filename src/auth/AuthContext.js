@@ -15,8 +15,7 @@ const AuthContext = createContext(null);
 
 // Callback page di GitHub Pages — HARUS didaftarkan di Google Cloud Console
 // → Credentials → Web Application → Authorized redirect URIs
-const CALLBACK_URL =
-  "https://ganoolmovie5th-cell.github.io/jastip-mobile-claude/callback.html";
+const CALLBACK_URL = "https://jastip-claude.vercel.app/callback.html";
 
 export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null);
