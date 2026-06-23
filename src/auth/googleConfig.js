@@ -12,10 +12,10 @@
 // pesan ramah bahwa OAuth belum dikonfigurasi (aplikasi tetap jalan di Expo Go).
 
 export const GOOGLE_CLIENT_IDS = {
-  // Web client dipakai untuk Expo Go dan web.
-  web: "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
-  android: "YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com",
-  ios: "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com",
+  // Web client dipakai untuk web build dan tes login lewat web.
+  web: "524436876503-h0d7sj52jv84b4krpo0g4318hbbs5c59.apps.googleusercontent.com",
+  android: "524436876503-2ml79rghoaqc8n9t5ofjcemntb9rpb5o.apps.googleusercontent.com",
+  ios: "524436876503-q4gmv41p02sef3nk1rvtcoa91lfa8o34.apps.googleusercontent.com",
 };
 
 // True kalau minimal satu client ID sudah benar-benar diisi.
