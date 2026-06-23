@@ -28,6 +28,11 @@ Mendorong pengguna membuka chat WhatsApp untuk mulai nitip, sambil membangun kep
 
 Hangat, jelas, meyakinkan, jujur. Bahasa Indonesia kasual-profesional. Hindari klaim berlebihan.
 
+## Sudah masuk cakupan (keputusan produk Jun 2026)
+
+- **Login Gmail (OAuth)** lewat `expo-auth-session`, kompatibel Expo Go, tanpa modul native kustom. Sesi disimpan lokal di AsyncStorage. Client ID diisi di `src/auth/googleConfig.js`.
+- **Pesanan saya**, **Alamat pengiriman** (CRUD + simpan lokal), **Metode pembayaran** (CRUD + simpan lokal), **Bantuan & FAQ**, dan **Tentang Jastipin** sudah jadi layar fungsional, bukan lagi placeholder.
+
 ## Di luar cakupan (saat ini)
 
-Belum ada autentikasi nyata, keranjang, checkout, atau pembayaran dalam aplikasi. Data masih contoh. Transaksi terjadi lewat WhatsApp. Jangan menambah alur ini tanpa keputusan produk yang jelas.
+Belum ada keranjang, checkout, atau pemrosesan pembayaran nyata (gateway) di dalam aplikasi. Metode pembayaran hanya disimpan sebagai preferensi pengguna. Data pesanan masih contoh. Transaksi tetap terjadi lewat WhatsApp. Jangan menambah alur backend/pembayaran nyata tanpa keputusan produk yang jelas.

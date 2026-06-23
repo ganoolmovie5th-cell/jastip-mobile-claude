@@ -85,12 +85,172 @@ export const sampleOrder = {
 };
 
 export const profileMenu = [
-  { id: "orders", label: "Pesanan saya", icon: "bag-handle-outline" },
-  { id: "address", label: "Alamat pengiriman", icon: "location-outline" },
-  { id: "payment", label: "Metode pembayaran", icon: "card-outline" },
-  { id: "help", label: "Bantuan & FAQ", icon: "help-circle-outline" },
-  { id: "about", label: "Tentang Jastipin", icon: "information-circle-outline" },
+  { id: "orders", label: "Pesanan saya", icon: "bag-handle-outline", route: "Orders" },
+  { id: "address", label: "Alamat pengiriman", icon: "location-outline", route: "Address" },
+  { id: "payment", label: "Metode pembayaran", icon: "card-outline", route: "Payment" },
+  { id: "help", label: "Bantuan & FAQ", icon: "help-circle-outline", route: "Help" },
+  { id: "about", label: "Tentang Jastipin", icon: "information-circle-outline", route: "About" },
 ];
+
+// Pesanan contoh untuk layar "Pesanan saya".
+// Status: diproses | dikirim | selesai | dibatalkan
+export const myOrders = [
+  {
+    id: "JTP-204815",
+    item: "Serum hyaluronic + cushion compact",
+    category: "Skincare & Beauty",
+    origin: "Seoul, Korea Selatan",
+    date: "12 Jun 2026",
+    status: "dikirim",
+    itemPrice: 770000,
+    serviceFee: 75000,
+    shipping: 95000,
+    steps: 5,
+    currentStep: 3,
+  },
+  {
+    id: "JTP-203190",
+    item: "Sneakers rilisan terbatas",
+    category: "Fashion & Sneakers",
+    origin: "Tokyo, Jepang",
+    date: "28 Mei 2026",
+    status: "selesai",
+    itemPrice: 2450000,
+    serviceFee: 180000,
+    shipping: 210000,
+    steps: 5,
+    currentStep: 5,
+  },
+  {
+    id: "JTP-205622",
+    item: "Wireless earbuds",
+    category: "Gadget & Elektronik",
+    origin: "California, Amerika",
+    date: "20 Jun 2026",
+    status: "diproses",
+    itemPrice: 3200000,
+    serviceFee: 220000,
+    shipping: 240000,
+    steps: 5,
+    currentStep: 1,
+  },
+  {
+    id: "JTP-201044",
+    item: "Paket cokelat matcha",
+    category: "Snack & Makanan",
+    origin: "Kyoto, Jepang",
+    date: "3 Mei 2026",
+    status: "selesai",
+    itemPrice: 240000,
+    serviceFee: 35000,
+    shipping: 80000,
+    steps: 5,
+    currentStep: 5,
+  },
+];
+
+export const orderStatusMeta = {
+  diproses: { label: "Diproses", color: "#e8762f", soft: "#fbeadd", icon: "time-outline" },
+  dikirim: { label: "Dikirim", color: "#0f5c4a", soft: "#e4efe9", icon: "airplane-outline" },
+  selesai: { label: "Selesai", color: "#2f7d4f", soft: "#e3f1e8", icon: "checkmark-done-outline" },
+  dibatalkan: { label: "Dibatalkan", color: "#b3261e", soft: "#f7e2e0", icon: "close-circle-outline" },
+};
+
+// Alamat awal (contoh). Pengguna bisa tambah / ubah / hapus, tersimpan di perangkat.
+export const seedAddresses = [
+  {
+    id: "addr-1",
+    label: "Rumah",
+    recipient: "Tukang Boong",
+    phone: "081200000000",
+    detail: "Jl. Melati No. 12, RT 03 / RW 05",
+    city: "Bandung",
+    province: "Jawa Barat",
+    postal: "40123",
+    isDefault: true,
+  },
+];
+
+// Tipe metode pembayaran yang bisa ditambahkan pengguna.
+export const paymentTypes = [
+  { id: "bank", label: "Transfer Bank", icon: "business-outline", hint: "BCA, Mandiri, BNI, BRI" },
+  { id: "ewallet", label: "E-Wallet", icon: "wallet-outline", hint: "GoPay, OVO, Dana, ShopeePay" },
+  { id: "va", label: "Virtual Account", icon: "card-outline", hint: "VA bank pilihan" },
+  { id: "qris", label: "QRIS", icon: "qr-code-outline", hint: "Scan untuk bayar" },
+];
+
+// Metode pembayaran awal (contoh).
+export const seedPayments = [
+  { id: "pay-1", type: "bank", title: "BCA", subtitle: "a.n. Tukang Boong", number: "1234567890", isDefault: true },
+  { id: "pay-2", type: "ewallet", title: "GoPay", subtitle: "Terhubung", number: "0812-0000-0000", isDefault: false },
+];
+
+export const faqs = [
+  {
+    id: "f1",
+    cat: "Umum",
+    q: "Apa itu jasa titip (jastip)?",
+    a: "Jastip adalah layanan menitipkan pembelian barang ke personal shopper. Kamu kirim link atau foto barang, kami belanjakan, lalu kirim sampai ke rumah. Cocok untuk barang impor yang sulit didapat di Indonesia.",
+  },
+  {
+    id: "f2",
+    cat: "Biaya",
+    q: "Bagaimana hitungan biayanya?",
+    a: "Total = harga barang + biaya titip + ongkir. Biaya titip bisa flat atau persentase, dan semuanya kami sampaikan transparan dalam Rupiah sebelum kamu setuju.",
+  },
+  {
+    id: "f3",
+    cat: "Pembayaran",
+    q: "Kenapa harus bayar di muka?",
+    a: "Karena personal shopper membelanjakan uang kamu lebih dulu di luar negeri. Kami kirim bukti pembelian tiap tahap supaya kamu tenang dan bisa pantau prosesnya.",
+  },
+  {
+    id: "f4",
+    cat: "Pengiriman",
+    q: "Berapa lama barang sampai?",
+    a: "Tergantung negara asal dan jenis barang, umumnya 7 sampai 21 hari. Kamu bisa pantau status di tab Lacak, dari dikonfirmasi sampai diantar.",
+  },
+  {
+    id: "f5",
+    cat: "Pengiriman",
+    q: "Bisa lacak pesanan saya?",
+    a: "Bisa. Buka tab Lacak atau menu Pesanan saya untuk melihat timeline tiap tahap beserta estimasi tibanya.",
+  },
+  {
+    id: "f6",
+    cat: "Pembayaran",
+    q: "Metode pembayaran apa saja yang didukung?",
+    a: "Transfer bank, e-wallet (GoPay, OVO, Dana, ShopeePay), virtual account, dan QRIS. Atur di menu Metode pembayaran.",
+  },
+  {
+    id: "f7",
+    cat: "Umum",
+    q: "Bagaimana kalau barang tidak sesuai?",
+    a: "Hubungi kami lewat WhatsApp secepatnya. Kami bantu cek bukti pembelian dan cari solusi terbaik bersama personal shopper.",
+  },
+];
+
+export const aboutContent = {
+  tagline: "Titip barang impor favoritmu, tanpa ribet.",
+  description:
+    "Jastipin menghubungkan kamu dengan personal shopper tepercaya untuk membeli barang yang sulit didapat di Indonesia: skincare Korea/Jepang, sneakers rilisan terbatas, gadget belum rilis resmi, sampai snack impor. Fokus kami satu: transparan dan bisa dipercaya.",
+  values: [
+    { icon: "shield-checkmark-outline", title: "Transparan", desc: "Harga, biaya titip, dan ongkir jelas sejak awal." },
+    { icon: "chatbubbles-outline", title: "Komunikatif", desc: "Update tiap tahap, dari belanja sampai diantar." },
+    { icon: "ribbon-outline", title: "Tepercaya", desc: "Bukti pembelian nyata untuk tiap pesanan." },
+  ],
+  stats: [
+    { label: "Negara asal", value: "38" },
+    { label: "Pesanan", value: "52rb+" },
+    { label: "Rating", value: "4,9" },
+  ],
+  links: [
+    { id: "ig", label: "Instagram", icon: "logo-instagram", url: "https://instagram.com" },
+    { id: "tiktok", label: "TikTok", icon: "logo-tiktok", url: "https://tiktok.com" },
+    { id: "web", label: "Situs web", icon: "globe-outline", url: "https://jastipin.example" },
+  ],
+  version: "1.0.0",
+};
 
 export function formatRupiah(n) {
   return "Rp" + n.toLocaleString("id-ID");

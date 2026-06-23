@@ -1,14 +1,28 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Pressable, Alert } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Pressable, Alert, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, radius, spacing, shadow } from "../theme";
 import { profileMenu } from "../data";
 import Button from "../components/Button";
 import { openWhatsApp } from "../whatsapp";
+import { useAuth } from "../auth/AuthContext";
 
-export default function ProfileScreen() {
+function initialsOf(name = "") {
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase()).join("") || "JT";
+}
+
+export default function ProfileScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const { user, isSignedIn, signOut } = useAuth();
+
+  function handleSignOut() {
+    Alert.alert("Keluar", "Yakin mau keluar dari akun?", [
+      { text: "Batal", style: "cancel" },
+      { text: "Keluar", style: "destructive", onPress: signOut },
+    ]);
+  }
 
   return (
     <ScrollView
@@ -20,14 +34,26 @@ export default function ProfileScreen() {
 
       {/* Profile card */}
       <View style={styles.card}>
-        <View style={styles.ava}>
-          <Text style={styles.avaText}>TC</Text>
-        </View>
+        {isSignedIn && user?.picture ? (
+          <Image source={{ uri: user.picture }} style={styles.avaImg} />
+        ) : (
+          <View style={styles.ava}>
+            <Text style={styles.avaText}>{isSignedIn ? initialsOf(user?.name) : "JT"}</Text>
+          </View>
+        )}
         <View style={{ flex: 1 }}>
-          <Text style={styles.name}>Tamu Jastipin</Text>
-          <Text style={styles.email}>Masuk untuk simpan pesanan</Text>
+          <Text style={styles.name}>{isSignedIn ? user?.name : "Tamu Jastipin"}</Text>
+          <Text style={styles.email} numberOfLines={1}>
+            {isSignedIn ? user?.email : "Masuk untuk simpan pesanan"}
+          </Text>
         </View>
-        <Button label="Masuk" variant="ghost" onPress={() => Alert.alert("Masuk", "Fitur login menyusul.")} />
+        {isSignedIn ? (
+          <Pressable hitSlop={8} onPress={handleSignOut} style={styles.logout}>
+            <Ionicons name="log-out-outline" size={22} color={colors.muted} />
+          </Pressable>
+        ) : (
+          <Button label="Masuk" variant="ghost" onPress={() => navigation.navigate("Login")} />
+        )}
       </View>
 
       {/* Menu */}
@@ -36,7 +62,7 @@ export default function ProfileScreen() {
           <Pressable
             key={m.id}
             style={[styles.row, i < profileMenu.length - 1 && styles.rowDivider]}
-            onPress={() => Alert.alert(m.label, "Halaman ini masih contoh.")}
+            onPress={() => navigation.navigate(m.route)}
           >
             <View style={styles.rowIcon}>
               <Ionicons name={m.icon} size={19} color={colors.brand} />
@@ -73,9 +99,11 @@ const styles = StyleSheet.create({
     ...shadow.card,
   },
   ava: { width: 54, height: 54, borderRadius: 27, backgroundColor: colors.brand, alignItems: "center", justifyContent: "center" },
+  avaImg: { width: 54, height: 54, borderRadius: 27, backgroundColor: colors.tint },
   avaText: { color: colors.white, fontWeight: "800", fontSize: 18 },
   name: { fontSize: 17, fontWeight: "800", color: colors.ink },
   email: { fontSize: 13, color: colors.muted, marginTop: 2 },
+  logout: { padding: 6 },
   menu: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,

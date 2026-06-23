@@ -31,15 +31,34 @@ Aplikasi punya empat tab utama:
 - **Beranda** - sapaan, pencarian, hero, statistik, cara kerja, kategori populer, promo, dan testimoni.
 - **Kategori** - grid kategori (fashion, beauty, gadget, snack). Ketuk untuk lihat contoh barang dan tombol titip.
 - **Lacak** - timeline status pesanan contoh, dari dikonfirmasi sampai diantar.
-- **Profil** - kartu profil dan menu akun.
+- **Profil** - login Gmail, kartu profil, dan menu akun yang sudah fungsional.
 
 Tombol titip dan kontak membuka **WhatsApp** lewat deep link.
+
+### Fitur akun (tab Profil)
+
+- **Login Gmail (OAuth)** - masuk dengan akun Google lewat `expo-auth-session`, kompatibel Expo Go, tanpa modul native kustom. Sesi tersimpan otomatis di perangkat.
+- **Pesanan saya** - daftar pesanan dengan filter status (diproses, dikirim, selesai) dan progress tiap tahap.
+- **Alamat pengiriman** - tambah, ubah, hapus, dan pilih alamat utama. Tersimpan lokal di perangkat.
+- **Metode pembayaran** - kelola transfer bank, e-wallet, virtual account, atau QRIS. Tersimpan lokal di perangkat.
+- **Bantuan & FAQ** - FAQ dengan pencarian, filter kategori, dan tombol chat WhatsApp.
+- **Tentang Jastipin** - profil layanan, nilai, statistik, dan tautan sosial.
+
+## Mengaktifkan login Gmail
+
+Login Gmail butuh OAuth client ID dari Google (gratis). Selama belum diisi, tombol login tetap muncul dan menampilkan pesan ramah bahwa OAuth belum dikonfigurasi (aplikasi tetap jalan).
+
+1. Buka [Google Cloud Console - Credentials](https://console.cloud.google.com/apis/credentials).
+2. Buat **OAuth client ID** untuk platform yang dipakai: Web (untuk Expo Go), Android (package `id.jastipin.app` + SHA-1), dan iOS (bundle `id.jastipin.app`).
+3. Tempel client ID-nya di `src/auth/googleConfig.js`.
 
 ## Tech stack
 
 - Expo SDK 54 (React Native 0.81, React 19.1)
 - React Navigation 7 (bottom tabs + native stack)
 - `@expo/vector-icons` (Ionicons), tanpa modul native kustom (kompatibel Expo Go)
+- `expo-auth-session` + `expo-web-browser` + `expo-crypto` untuk login Gmail (OAuth)
+- `@react-native-async-storage/async-storage` untuk simpan sesi, alamat, dan pembayaran di perangkat
 - JavaScript murni, tanpa TypeScript
 
 ## Struktur proyek
