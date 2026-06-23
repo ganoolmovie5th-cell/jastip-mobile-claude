@@ -4,56 +4,109 @@
 
 ```
 jastip-mobile-claude/
-├── App.js                  # Root: SafeAreaProvider + NavigationContainer + Tab.Navigator
+├── App.js                  # Root: AppProvider + AuthProvider + StoreProvider + AppNavigator
 ├── index.js                # registerRootComponent(App)
-├── app.json                # Konfigurasi Expo (nama, slug, ikon, splash, bundle id)
-├── babel.config.js         # preset babel-preset-expo
-├── package.json            # Dependensi terkunci ke SDK 55
+├── app.json                # Konfigurasi Expo (owner: ganoolmovie5th, slug: jastip-mobile-claude, scheme: jastipin)
+├── babel.config.js
+├── package.json
+├── eas.json
+├── docs/
+│   └── callback.html       # Callback page (GitHub Pages fallback, tidak aktif)
 ├── assets/
-│   ├── icon.png            # Ikon aplikasi (parcel mark di kotak teal)
-│   ├── adaptive-icon.png   # Ikon adaptif Android (sama dengan icon)
-│   ├── splash.png          # Splash (logo + wordmark di latar teal)
-│   ├── favicon.png         # Favicon web
-│   └── hero/beauty/fashion/gadget/snacks.jpg  # Gambar produk
-├── src/
-│   ├── theme.js            # Token desain + WHATSAPP_NUMBER
-│   ├── data.js             # Data contoh + formatRupiah()
-│   ├── whatsapp.js         # openWhatsApp(message)
-│   ├── components/
-│   │   ├── Button.js       # Tombol solid/ghost dengan ikon opsional
-│   │   └── SectionHeader.js
-│   └── screens/
-│       ├── HomeScreen.js           # Tab Beranda
-│       ├── CategoriesScreen.js     # Tab Kategori (grid)
-│       ├── CategoryDetailScreen.js # Detail kategori (push dari grid/Home)
-│       ├── TrackScreen.js          # Tab Lacak (timeline pesanan)
-│       └── ProfileScreen.js        # Tab Profil
-├── README.md
-├── AGENTS.md / CLAUDE.md
-└── .kiro/steering/         # product.md, tech.md, structure.md
+│   ├── icon.png  adaptive-icon.png  splash.png  favicon.png
+│   └── hero.jpg  beauty.jpg  fashion.jpg  gadget.jpg  snacks.jpg
+└── src/
+    ├── theme.js             # lightColors, darkColors, radius, spacing, shadow, WHATSAPP_NUMBER
+    ├── data.js              # Data mock: kategori, steps, stats, pesanan, FAQ, about, helpers
+    ├── storage.js           # loadJSON / saveJSON / removeKey + STORAGE_KEYS
+    ├── whatsapp.js          # openWhatsApp(message)
+    ├── context/
+    │   └── AppContext.js    # useAppTheme() → { colors, isDarkMode, toggleDarkMode,
+    │                        #   language, setLanguage, t(key,vars), ready }
+    ├── auth/
+    │   ├── AuthContext.js   # useAuth() → { user, isSignedIn, signingIn, signInWithGoogle, signOut }
+    │   └── googleConfig.js  # GOOGLE_CLIENT_IDS (web, android, ios) — isi di sini
+    ├── store/
+    │   └── StoreContext.js  # useStore() → pesanan, alamat, pembayaran, notifikasi
+    │                        # Simulator setInterval(20s) untuk advance pesanan aktif
+    ├── components/
+    │   ├── Button.js        # <Button label variant icon onPress style> — dark-mode aware
+    │   └── SectionHeader.js # <SectionHeader title action onAction> — dark-mode aware
+    └── screens/
+        ├── HomeScreen.js           # Tab Beranda — search real-time filter kategori
+        ├── CategoriesScreen.js     # Tab Kategori — grid 2 kolom, CARD_W dari Dimensions
+        ├── CategoryDetailScreen.js # Detail kategori (push dari grid atau Beranda)
+        ├── TrackScreen.js          # Tab Lacak — search auto-select card
+        ├── ProfileScreen.js        # Tab Profil — menu + toggle bahasa + toggle dark mode
+        ├── LoginScreen.js          # Login Google (dari ProfileStack)
+        ├── NotificationsScreen.js  # Notifikasi (dari HomeStack)
+        ├── OrdersScreen.js         # Pesanan saya
+        ├── OrderDetailScreen.js    # Detail satu pesanan
+        ├── AddressScreen.js        # Daftar alamat
+        ├── AddressFormScreen.js    # Form tambah/ubah alamat
+        ├── PaymentScreen.js        # Metode pembayaran
+        ├── HelpScreen.js           # Bantuan & FAQ
+        └── AboutScreen.js          # Tentang Jastipin
 ```
 
-## Navigasi
+## Navigasi — `App.js`
 
-- **Tab bawah**: Beranda, Kategori, Lacak, Profil (ikon Ionicons, aktif/non-aktif).
-- Tab **Kategori** berisi native stack: `CategoriesList` -> `CategoryDetail`.
-- Dari Beranda, ketuk kategori akan `navigate("Kategori", { screen: "CategoryDetail", params })`.
+```
+AppProvider (dark mode + bahasa)
+└── AuthProvider (sesi Google)
+    └── StoreProvider (pesanan, alamat, notifikasi)
+        └── AppNavigator
+            └── Tab.Navigator
+                ├── Beranda  → HomeStack
+                │              ├── BerandaScreen (HomeScreen, headerShown: false)
+                │              └── Notifications
+                ├── Kategori → CategoriesStack
+                │              ├── CategoriesList
+                │              └── CategoryDetail
+                ├── Lacak    → TrackScreen (tab langsung, bukan stack)
+                └── Profil   → ProfileStack
+                               ├── ProfileHome (ProfileScreen, headerShown: false)
+                               ├── Login
+                               ├── Orders → OrderDetail
+                               ├── Address → AddressForm
+                               ├── Payment
+                               ├── Help
+                               └── About
+```
+
+**Back button**: semua stack pakai `headerBackButtonDisplayMode: 'generic'` → selalu tampil "Back".  
+**Judul header**: menggunakan `t('nav.xxx')` dari `useAppTheme()` agar mengikuti bahasa aktif.
+
+## STORAGE_KEYS (AsyncStorage)
+
+| Key | Isi |
+|-----|-----|
+| `jastipin.user` | Sesi login Google |
+| `jastipin.addresses` | Daftar alamat pengiriman |
+| `jastipin.payments` | Daftar metode pembayaran |
+| `jastipin.notifications` | Notifikasi (max 50) |
+| `jastipin.app_settings` | Dark mode + bahasa |
 
 ## Aturan menambah layar atau fitur
 
-- Layar baru taruh di `src/screens`, daftarkan di `App.js` (tab atau stack yang sesuai).
-- Pakai komponen `Button` dan `SectionHeader` yang ada agar konsisten.
-- Ambil warna/ukuran dari `src/theme.js`, jangan hardcode.
-- Data baru taruh di `src/data.js` sebagai mock sampai ada backend.
-- Layar scroll panjang pakai `ScrollView`/`FlatList` dengan `showsVerticalScrollIndicator={false}` dan padding bawah yang cukup.
-
-## Yang tidak boleh di-commit
-
-- `node_modules/`, `dist/`, `.expo/`, folder `ios/` dan `android/` hasil prebuild.
-- File QA sementara (`.preview/`) dan file sistem.
+1. Layar baru taruh di `src/screens`, daftarkan di `App.js`.
+2. Selalu gunakan pola `makeStyles(colors)` + `useMemo` agar dark mode bekerja.
+3. Ambil warna dari `useAppTheme()`, jangan import `colors` dari `theme.js` langsung.
+4. Teks yang user-facing wajib ditambahkan ke `AppContext.js` (strings ID + EN).
+5. Data baru taruh di `src/data.js` sebagai mock sampai ada backend.
+6. Pakai komponen `Button` dan `SectionHeader` yang ada agar konsisten.
 
 ## Titik konfigurasi penting
 
-- Nomor WhatsApp: `src/theme.js` (`WHATSAPP_NUMBER`).
-- Data kategori, barang, pesanan, testimoni: `src/data.js`.
-- Nama aplikasi, ikon, splash, bundle id: `app.json`.
+| Apa | Di mana |
+|-----|---------|
+| Nomor WhatsApp | `src/theme.js` → `WHATSAPP_NUMBER` |
+| Client ID Google | `src/auth/googleConfig.js` |
+| Callback OAuth URL | `src/auth/AuthContext.js` → `CALLBACK_URL` |
+| Data kategori & pesanan | `src/data.js` |
+| Nama app, ikon, splash | `app.json` |
+| Terjemahan ID/EN | `src/context/AppContext.js` → objek `strings` |
+
+## Yang tidak boleh di-commit
+
+`node_modules/`, `dist/`, `.expo/`, `ios/`, `android/` (hasil prebuild), `.preview/`.

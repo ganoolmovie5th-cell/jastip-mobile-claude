@@ -3,38 +3,113 @@
 ## Stack
 
 - **Expo SDK 54** (managed workflow), **React Native 0.81**, **React 19.1**.
-- **React Navigation 7**: `@react-navigation/native`, `bottom-tabs`, `native-stack`, dengan `react-native-screens` dan `react-native-safe-area-context`.
-- Ikon: `@expo/vector-icons` (Ionicons), ikut dengan paket `expo`.
-- JavaScript murni (bukan TypeScript). Entry `index.js` -> `App.js`.
+- **React Navigation 7**: `@react-navigation/native`, `bottom-tabs`, `native-stack`.
+- Ikon: `@expo/vector-icons` (Ionicons).
+- Auth: `expo-web-browser` + `expo-linking` (OAuth manual tanpa proxy).
+- Storage: `@react-native-async-storage/async-storage`.
+- JavaScript murni (bukan TypeScript). Entry `index.js` → `App.js`.
 
 ## Aturan kompatibilitas Expo Go (kritis)
 
-- **Jangan tambah modul native kustom** yang butuh dev build. Hanya paket Expo SDK, React Navigation, dan JS murni.
-- Tambah paket selalu dengan `npx expo install <paket>` agar versinya cocok dengan SDK 54. Jangan `npm install` versi bebas untuk paket ekosistem RN/Expo.
-- Kunci ke SDK 54 selama Expo Go di store masih versi 54.x. Kalau perlu ganti SDK, ubah `expo` di `package.json`, lalu `npx expo install --fix` untuk menyelaraskan semua dependensi.
+- **Jangan tambah modul native kustom** yang butuh dev build.
+- Tambah paket selalu dengan `npx expo install <paket>`, bukan `npm install` bebas.
+- Kunci ke SDK 54. Untuk ganti SDK: ubah `expo` di `package.json`, lalu `npx expo install --fix`.
+- Jalankan dengan `npx expo start --go` (bukan `npx expo start` biasa) agar QR code kompatibel.
 
-## Design system (sumber kebenaran: `src/theme.js`)
+## Design system — `src/theme.js`
+
+### Light mode (`lightColors`)
 
 | Token | Nilai |
 |-------|-------|
 | `brand` | `#0f5c4a` (teal hijau) |
 | `brandStrong` | `#0a4537` |
+| `brandSoft` | `#e4efe9` |
 | `accent` | `#e8762f` (oranye, satu-satunya warna aksi) |
 | `bg` | `#faf6ee` (krem) |
+| `surface` | `#ffffff` |
 | `tint` | `#f1ece0` |
 | `ink` | `#1b2420` (teks) |
 | `muted` | `#5d6b63` (teks sekunder) |
-| `radius` | sm 12, md 18, lg 24, pill 999 |
+| `line` | `#e6ddcd` |
 
-Aturan: satu warna aksen, satu sistem radius, jangan hardcode warna di komponen (ambil dari `theme.js`).
+### Dark mode (`darkColors`)
+
+| Token | Nilai |
+|-------|-------|
+| `bg` | `#111916` |
+| `surface` | `#182420` |
+| `tint` | `#1e2e29` |
+| `ink` | `#eeeae3` |
+| `muted` | `#7d9189` |
+| `line` | `#263530` |
+| `brand` | `#1fb789` |
+| `brandSoft` | `#162d26` |
+| `accent` | `#e8762f` (sama) |
+
+**Aturan**: jangan hardcode warna di komponen. Selalu ambil dari `useAppTheme()` (bukan import langsung dari `theme.js`).
+
+## AppContext — `src/context/AppContext.js`
+
+Context global untuk dark mode dan bahasa. Wajib dipakai di semua komponen yang butuh warna atau teks terjemahan.
+
+```js
+const { colors, isDarkMode, toggleDarkMode, language, setLanguage, t } = useAppTheme();
+```
+
+- `colors` — objek warna aktif (light atau dark)
+- `t(key, vars)` — fungsi terjemahan ID/EN
+- Preferensi disimpan di `AsyncStorage` key `jastipin.app_settings`
+
+## Pola dark mode di komponen/layar
+
+Semua layar menggunakan pola `makeStyles(colors)` + `useMemo`:
+
+```js
+// Di luar komponen:
+function makeStyles(colors) {
+  return StyleSheet.create({
+    container: { backgroundColor: colors.bg },
+    text: { color: colors.ink },
+    // ...
+  });
+}
+
+// Di dalam komponen:
+const { colors } = useAppTheme();
+const styles = useMemo(() => makeStyles(colors), [colors]);
+```
+
+Jangan buat `StyleSheet.create` di level modul (statis) kalau file tersebut perlu dark mode.
+
+## Navigasi — `App.js`
+
+- **Semua stack** punya `headerBackButtonDisplayMode: 'generic'` di `screenOptions` → back button selalu tampil "Back" (iOS).
+- Judul navigasi menggunakan `t('nav.xxx')` dari `useAppTheme()` agar mengikuti bahasa aktif.
+- Warna tab bar dan header mengikuti `colors` dari `AppContext` secara reaktif.
+
+## Auth Google — `src/auth/AuthContext.js`
+
+OAuth tanpa proxy `auth.expo.io`:
+1. App generate `appUrl = Linking.createURL("")` (= `exp://IP:PORT` di Expo Go).
+2. Buka Google OAuth dengan `redirectUri = https://jastip-claude.vercel.app/callback.html` dan `state = appUrl`.
+3. Callback page membaca `access_token` dari hash, redirect ke `appUrl?access_token=xxx`.
+4. `WebBrowser.openAuthSessionAsync` memonitor `appUrl` dan intercept redirect.
+5. App ekstrak token, fetch profil via `https://www.googleapis.com/userinfo/v2/me`.
+
+**Client ID yang dipakai**: selalu `GOOGLE_CLIENT_IDS.web` (bukan iOS/Android) karena redirect URI adalah HTTPS.
 
 ## Konvensi kode
 
-- Komponen fungsional + hooks. `StyleSheet.create` per file, di bawah komponen.
-- Layar di `src/screens`, komponen pakai-ulang di `src/components`, data contoh di `src/data.js`.
-- Layar tanpa header (tab) wajib `useSafeAreaInsets` untuk padding atas. Layar dalam stack pakai header bawaan.
+- Komponen fungsional + hooks.
+- Layar di `src/screens`, komponen reusable di `src/components`, data mock di `src/data.js`, context di `src/context/`.
+- Layar tanpa header (tab root) wajib `useSafeAreaInsets` untuk padding atas.
 - Tombol titip/kontak memanggil `openWhatsApp()` dari `src/whatsapp.js`.
 
 ## Verifikasi sebelum selesai
 
-Jalankan `npx expo export --platform android`. Harus selesai dengan "Exported: dist" tanpa error bundling. Ini membuktikan semua import dan aset valid sebelum dites di Expo Go.
+```bash
+npx expo export --platform android
+```
+
+Harus selesai dengan "Exported: dist" tanpa error bundling.
