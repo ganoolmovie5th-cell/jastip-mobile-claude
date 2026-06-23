@@ -1,11 +1,12 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useMemo } from "react";
 import { View, Text, ScrollView, StyleSheet, TextInput, Pressable, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radius, spacing } from "../theme";
+import { radius, spacing } from "../theme";
+import { useAppTheme } from "../context/AppContext";
 import Button from "../components/Button";
 import { useStore } from "../store/StoreContext";
 
-function Field({ label, value, onChangeText, placeholder, keyboardType, multiline }) {
+function Field({ label, value, onChangeText, placeholder, keyboardType, multiline, colors, styles }) {
   return (
     <View style={{ marginBottom: spacing.md }}>
       <Text style={styles.fieldLabel}>{label}</Text>
@@ -25,6 +26,8 @@ function Field({ label, value, onChangeText, placeholder, keyboardType, multilin
 export default function AddressFormScreen({ route, navigation }) {
   const editing = route.params?.address || null;
   const { upsertAddress } = useStore();
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const [form, setForm] = useState({
     id: editing?.id,
@@ -53,6 +56,8 @@ export default function AddressFormScreen({ route, navigation }) {
     navigation.goBack();
   }
 
+  const fieldProps = { colors, styles };
+
   return (
     <ScrollView
       style={{ backgroundColor: colors.bg }}
@@ -60,20 +65,20 @@ export default function AddressFormScreen({ route, navigation }) {
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
-      <Field label="Label alamat" value={form.label} onChangeText={set("label")} placeholder="Rumah, Kantor, Kos..." />
-      <Field label="Nama penerima" value={form.recipient} onChangeText={set("recipient")} placeholder="Nama lengkap" />
-      <Field label="Nomor HP" value={form.phone} onChangeText={set("phone")} placeholder="08xxxxxxxxxx" keyboardType="phone-pad" />
-      <Field label="Alamat lengkap" value={form.detail} onChangeText={set("detail")} placeholder="Jalan, nomor, RT/RW, patokan" multiline />
+      <Field label="Label alamat" value={form.label} onChangeText={set("label")} placeholder="Rumah, Kantor, Kos..." {...fieldProps} />
+      <Field label="Nama penerima" value={form.recipient} onChangeText={set("recipient")} placeholder="Nama lengkap" {...fieldProps} />
+      <Field label="Nomor HP" value={form.phone} onChangeText={set("phone")} placeholder="08xxxxxxxxxx" keyboardType="phone-pad" {...fieldProps} />
+      <Field label="Alamat lengkap" value={form.detail} onChangeText={set("detail")} placeholder="Jalan, nomor, RT/RW, patokan" multiline {...fieldProps} />
       <View style={styles.row}>
         <View style={{ flex: 1 }}>
-          <Field label="Kota" value={form.city} onChangeText={set("city")} placeholder="Kota" />
+          <Field label="Kota" value={form.city} onChangeText={set("city")} placeholder="Kota" {...fieldProps} />
         </View>
         <View style={{ width: spacing.md }} />
         <View style={{ flex: 1 }}>
-          <Field label="Kode pos" value={form.postal} onChangeText={set("postal")} placeholder="40123" keyboardType="number-pad" />
+          <Field label="Kode pos" value={form.postal} onChangeText={set("postal")} placeholder="40123" keyboardType="number-pad" {...fieldProps} />
         </View>
       </View>
-      <Field label="Provinsi" value={form.province} onChangeText={set("province")} placeholder="Provinsi" />
+      <Field label="Provinsi" value={form.province} onChangeText={set("province")} placeholder="Provinsi" {...fieldProps} />
 
       <Pressable style={styles.toggle} onPress={() => set("isDefault")(!form.isDefault)}>
         <Ionicons
@@ -89,19 +94,21 @@ export default function AddressFormScreen({ route, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  fieldLabel: { fontSize: 13.5, fontWeight: "700", color: colors.ink, marginBottom: 7 },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: radius.sm,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 14.5,
-    color: colors.ink,
-  },
-  row: { flexDirection: "row" },
-  toggle: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 4 },
-  toggleText: { fontSize: 14.5, fontWeight: "600", color: colors.ink },
-});
+function makeStyles(colors) {
+  return StyleSheet.create({
+    fieldLabel: { fontSize: 13.5, fontWeight: "700", color: colors.ink, marginBottom: 7 },
+    input: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.line,
+      borderRadius: radius.sm,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: 14.5,
+      color: colors.ink,
+    },
+    row: { flexDirection: "row" },
+    toggle: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 4 },
+    toggleText: { fontSize: 14.5, fontWeight: "600", color: colors.ink },
+  });
+}

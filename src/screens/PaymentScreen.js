@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable, Modal, TextInput, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radius, spacing, shadow } from "../theme";
+import { radius, spacing, shadow } from "../theme";
+import { useAppTheme } from "../context/AppContext";
 import Button from "../components/Button";
 import { useStore } from "../store/StoreContext";
 import { paymentTypes } from "../data";
@@ -12,16 +13,15 @@ function typeMeta(typeId) {
 
 export default function PaymentScreen() {
   const { payments, addPayment, removePayment, setDefaultPayment } = useStore();
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   const [modal, setModal] = useState(false);
   const [type, setType] = useState("bank");
   const [title, setTitle] = useState("");
   const [number, setNumber] = useState("");
 
-  function reset() {
-    setType("bank");
-    setTitle("");
-    setNumber("");
-  }
+  function reset() { setType("bank"); setTitle(""); setNumber(""); }
 
   function save() {
     if (!title.trim() || !number.trim()) {
@@ -52,11 +52,7 @@ export default function PaymentScreen() {
           payments.map((p) => {
             const meta = typeMeta(p.type);
             return (
-              <Pressable
-                key={p.id}
-                style={styles.card}
-                onPress={() => setDefaultPayment(p.id)}
-              >
+              <Pressable key={p.id} style={styles.card} onPress={() => setDefaultPayment(p.id)}>
                 <View style={styles.icon}>
                   <Ionicons name={meta.icon} size={20} color={colors.brand} />
                 </View>
@@ -69,9 +65,7 @@ export default function PaymentScreen() {
                       </View>
                     ) : null}
                   </View>
-                  <Text style={styles.sub}>
-                    {meta.label} · {p.number}
-                  </Text>
+                  <Text style={styles.sub}>{meta.label} · {p.number}</Text>
                 </View>
                 <Pressable hitSlop={10} onPress={() => confirmDelete(p)}>
                   <Ionicons name="trash-outline" size={19} color={colors.muted} />
@@ -80,7 +74,6 @@ export default function PaymentScreen() {
             );
           })
         )}
-
         <Text style={styles.hint}>Ketuk metode untuk menjadikannya utama.</Text>
       </ScrollView>
 
@@ -99,11 +92,7 @@ export default function PaymentScreen() {
               {paymentTypes.map((t) => {
                 const active = type === t.id;
                 return (
-                  <Pressable
-                    key={t.id}
-                    onPress={() => setType(t.id)}
-                    style={[styles.typeChip, active && styles.typeChipActive]}
-                  >
+                  <Pressable key={t.id} onPress={() => setType(t.id)} style={[styles.typeChip, active && styles.typeChipActive]}>
                     <Ionicons name={t.icon} size={16} color={active ? colors.white : colors.brand} />
                     <Text style={[styles.typeChipText, active && { color: colors.white }]}>{t.label}</Text>
                   </Pressable>
@@ -146,75 +135,77 @@ export default function PaymentScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    ...shadow.card,
-  },
-  icon: { width: 42, height: 42, borderRadius: 13, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" },
-  titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  title: { fontSize: 15.5, fontWeight: "800", color: colors.ink },
-  defaultTag: { backgroundColor: colors.brandSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill },
-  defaultTagText: { fontSize: 11, fontWeight: "700", color: colors.brand },
-  sub: { fontSize: 13, color: colors.muted, marginTop: 3 },
-  hint: { fontSize: 12.5, color: colors.muted, textAlign: "center", marginTop: 4 },
-  empty: { alignItems: "center", paddingVertical: 60, gap: 12 },
-  emptyText: { fontSize: 14.5, color: colors.muted },
-  footer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    padding: spacing.md,
-    backgroundColor: colors.bg,
-    borderTopWidth: 1,
-    borderTopColor: colors.line,
-  },
-  modalBackdrop: { flex: 1, backgroundColor: "rgba(27,36,32,0.45)", justifyContent: "flex-end" },
-  sheet: {
-    backgroundColor: colors.bg,
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
-    padding: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
-  sheetHandle: { width: 44, height: 5, borderRadius: 3, backgroundColor: colors.line, alignSelf: "center", marginBottom: spacing.md },
-  sheetTitle: { fontSize: 18, fontWeight: "800", color: colors.ink, marginBottom: spacing.md },
-  fieldLabel: { fontSize: 13.5, fontWeight: "700", color: colors.ink, marginBottom: 8, marginTop: 6 },
-  typeGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  typeChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.line,
-  },
-  typeChipActive: { backgroundColor: colors.brand, borderColor: colors.brand },
-  typeChipText: { fontSize: 13, fontWeight: "600", color: colors.brand },
-  typeHint: { fontSize: 12, color: colors.muted, marginTop: 8 },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: radius.sm,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 14.5,
-    color: colors.ink,
-  },
-  sheetActions: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: spacing.lg },
-  cancelBtn: { paddingVertical: 14, paddingHorizontal: 20 },
-  cancelText: { fontSize: 15, fontWeight: "700", color: colors.muted },
-});
+function makeStyles(colors) {
+  return StyleSheet.create({
+    card: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 14,
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.line,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      ...shadow.card,
+    },
+    icon: { width: 42, height: 42, borderRadius: 13, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" },
+    titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+    title: { fontSize: 15.5, fontWeight: "800", color: colors.ink },
+    defaultTag: { backgroundColor: colors.brandSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill },
+    defaultTagText: { fontSize: 11, fontWeight: "700", color: colors.brand },
+    sub: { fontSize: 13, color: colors.muted, marginTop: 3 },
+    hint: { fontSize: 12.5, color: colors.muted, textAlign: "center", marginTop: 4 },
+    empty: { alignItems: "center", paddingVertical: 60, gap: 12 },
+    emptyText: { fontSize: 14.5, color: colors.muted },
+    footer: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: 0,
+      padding: spacing.md,
+      backgroundColor: colors.bg,
+      borderTopWidth: 1,
+      borderTopColor: colors.line,
+    },
+    modalBackdrop: { flex: 1, backgroundColor: "rgba(27,36,32,0.55)", justifyContent: "flex-end" },
+    sheet: {
+      backgroundColor: colors.bg,
+      borderTopLeftRadius: radius.lg,
+      borderTopRightRadius: radius.lg,
+      padding: spacing.lg,
+      paddingBottom: spacing.xl,
+    },
+    sheetHandle: { width: 44, height: 5, borderRadius: 3, backgroundColor: colors.line, alignSelf: "center", marginBottom: spacing.md },
+    sheetTitle: { fontSize: 18, fontWeight: "800", color: colors.ink, marginBottom: spacing.md },
+    fieldLabel: { fontSize: 13.5, fontWeight: "700", color: colors.ink, marginBottom: 8, marginTop: 6 },
+    typeGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+    typeChip: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingHorizontal: 14,
+      paddingVertical: 9,
+      borderRadius: radius.pill,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.line,
+    },
+    typeChipActive: { backgroundColor: colors.brand, borderColor: colors.brand },
+    typeChipText: { fontSize: 13, fontWeight: "600", color: colors.brand },
+    typeHint: { fontSize: 12, color: colors.muted, marginTop: 8 },
+    input: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.line,
+      borderRadius: radius.sm,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: 14.5,
+      color: colors.ink,
+    },
+    sheetActions: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: spacing.lg },
+    cancelBtn: { paddingVertical: 14, paddingHorizontal: 20 },
+    cancelText: { fontSize: 15, fontWeight: "700", color: colors.muted },
+  });
+}

@@ -1,21 +1,23 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radius, spacing, shadow } from "../theme";
+import { radius, spacing, shadow } from "../theme";
+import { useAppTheme } from "../context/AppContext";
 import { useAuth } from "../auth/AuthContext";
-
-const PERKS = [
-  { icon: "bag-handle-outline", text: "Simpan dan lacak semua pesananmu" },
-  { icon: "location-outline", text: "Alamat pengiriman tersimpan otomatis" },
-  { icon: "card-outline", text: "Metode pembayaran lebih cepat" },
-];
 
 export default function LoginScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { signInWithGoogle, signingIn, isSignedIn } = useAuth();
+  const { colors, t } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
-  // Begitu berhasil masuk, kembali ke profil.
+  const PERKS = [
+    { icon: "bag-handle-outline", text: t("login.perk1") },
+    { icon: "location-outline", text: t("login.perk2") },
+    { icon: "card-outline", text: t("login.perk3") },
+  ];
+
   React.useEffect(() => {
     if (isSignedIn) navigation.goBack();
   }, [isSignedIn]);
@@ -26,10 +28,8 @@ export default function LoginScreen({ navigation }) {
         <View style={styles.logo}>
           <Ionicons name="cube" size={34} color={colors.white} />
         </View>
-        <Text style={styles.title}>Masuk ke Jastipin</Text>
-        <Text style={styles.sub}>
-          Masuk pakai akun Google biar pesanan, alamat, dan pembayaranmu tersimpan aman.
-        </Text>
+        <Text style={styles.title}>{t("login.title")}</Text>
+        <Text style={styles.sub}>{t("login.sub")}</Text>
       </View>
 
       <View style={styles.perks}>
@@ -53,65 +53,65 @@ export default function LoginScreen({ navigation }) {
         ) : (
           <>
             <Ionicons name="logo-google" size={20} color="#ea4335" />
-            <Text style={styles.googleText}>Lanjut dengan Google</Text>
+            <Text style={styles.googleText}>{t("login.google_btn")}</Text>
           </>
         )}
       </Pressable>
 
-      <Text style={styles.note}>
-        Dengan masuk, kamu setuju dengan ketentuan layanan dan kebijakan privasi Jastipin.
-      </Text>
+      <Text style={styles.note}>{t("login.note")}</Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: spacing.lg },
-  hero: { alignItems: "center", marginTop: spacing.xl, marginBottom: spacing.xl },
-  logo: {
-    width: 72,
-    height: 72,
-    borderRadius: 22,
-    backgroundColor: colors.brand,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: spacing.md,
-    ...shadow.card,
-  },
-  title: { fontSize: 24, fontWeight: "800", color: colors.ink, letterSpacing: -0.5 },
-  sub: { fontSize: 14.5, color: colors.muted, textAlign: "center", marginTop: 10, lineHeight: 21 },
-  perks: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: spacing.md,
-    gap: 14,
-    ...shadow.card,
-  },
-  perkRow: { flexDirection: "row", alignItems: "center", gap: 12 },
-  perkIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 11,
-    backgroundColor: colors.brandSoft,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  perkText: { flex: 1, fontSize: 14.5, color: colors.ink, fontWeight: "600" },
-  googleBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    backgroundColor: colors.surface,
-    borderRadius: radius.pill,
-    borderWidth: 1.5,
-    borderColor: colors.line,
-    paddingVertical: 15,
-    marginTop: spacing.xl,
-    ...shadow.card,
-  },
-  googleText: { fontSize: 15.5, fontWeight: "700", color: colors.ink },
-  note: { fontSize: 12, color: colors.muted, textAlign: "center", marginTop: spacing.md, lineHeight: 18 },
-});
+function makeStyles(colors) {
+  return StyleSheet.create({
+    wrap: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: spacing.lg },
+    hero: { alignItems: "center", marginTop: spacing.xl, marginBottom: spacing.xl },
+    logo: {
+      width: 72,
+      height: 72,
+      borderRadius: 22,
+      backgroundColor: colors.brand,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: spacing.md,
+      ...shadow.card,
+    },
+    title: { fontSize: 24, fontWeight: "800", color: colors.ink, letterSpacing: -0.5 },
+    sub: { fontSize: 14.5, color: colors.muted, textAlign: "center", marginTop: 10, lineHeight: 21 },
+    perks: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.line,
+      padding: spacing.md,
+      gap: 14,
+      ...shadow.card,
+    },
+    perkRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+    perkIcon: {
+      width: 36,
+      height: 36,
+      borderRadius: 11,
+      backgroundColor: colors.brandSoft,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    perkText: { flex: 1, fontSize: 14.5, color: colors.ink, fontWeight: "600" },
+    googleBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 12,
+      backgroundColor: colors.surface,
+      borderRadius: radius.pill,
+      borderWidth: 1.5,
+      borderColor: colors.line,
+      paddingVertical: 15,
+      marginTop: spacing.xl,
+      ...shadow.card,
+    },
+    googleText: { fontSize: 15.5, fontWeight: "700", color: colors.ink },
+    note: { fontSize: 12, color: colors.muted, textAlign: "center", marginTop: spacing.md, lineHeight: 18 },
+  });
+}

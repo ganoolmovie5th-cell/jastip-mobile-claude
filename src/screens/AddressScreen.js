@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radius, spacing, shadow } from "../theme";
+import { radius, spacing, shadow } from "../theme";
+import { useAppTheme } from "../context/AppContext";
 import Button from "../components/Button";
 import { useStore } from "../store/StoreContext";
 
 export default function AddressScreen({ navigation }) {
   const { addresses, removeAddress, setDefaultAddress } = useStore();
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   function confirmDelete(addr) {
     Alert.alert("Hapus alamat", `Hapus alamat "${addr.label}"?`, [
@@ -43,14 +46,8 @@ export default function AddressScreen({ navigation }) {
                   <Ionicons name="create-outline" size={20} color={colors.muted} />
                 </Pressable>
               </View>
-
-              <Text style={styles.recipient}>
-                {a.recipient} · {a.phone}
-              </Text>
-              <Text style={styles.detail}>
-                {a.detail}, {a.city}, {a.province} {a.postal}
-              </Text>
-
+              <Text style={styles.recipient}>{a.recipient} · {a.phone}</Text>
+              <Text style={styles.detail}>{a.detail}, {a.city}, {a.province} {a.postal}</Text>
               <View style={styles.actions}>
                 {!a.isDefault ? (
                   <Pressable style={styles.actionBtn} onPress={() => setDefaultAddress(a.id)}>
@@ -69,56 +66,53 @@ export default function AddressScreen({ navigation }) {
           ))
         )}
       </ScrollView>
-
       <View style={styles.footer}>
-        <Button
-          label="Tambah alamat baru"
-          icon="add"
-          onPress={() => navigation.navigate("AddressForm", {})}
-        />
+        <Button label="Tambah alamat baru" icon="add" onPress={() => navigation.navigate("AddressForm", {})} />
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    ...shadow.card,
-  },
-  cardTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  labelWrap: { flexDirection: "row", alignItems: "center", gap: 6 },
-  label: { fontSize: 15.5, fontWeight: "800", color: colors.ink },
-  defaultTag: { backgroundColor: colors.brandSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill },
-  defaultTagText: { fontSize: 11, fontWeight: "700", color: colors.brand },
-  recipient: { fontSize: 14, fontWeight: "600", color: colors.ink, marginTop: 10 },
-  detail: { fontSize: 13.5, color: colors.muted, marginTop: 4, lineHeight: 20 },
-  actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 14,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.line,
-  },
-  actionBtn: { flexDirection: "row", alignItems: "center", gap: 5 },
-  actionText: { fontSize: 13.5, fontWeight: "700", color: colors.brand },
-  empty: { alignItems: "center", paddingVertical: 60, gap: 12 },
-  emptyText: { fontSize: 14.5, color: colors.muted },
-  footer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    padding: spacing.md,
-    backgroundColor: colors.bg,
-    borderTopWidth: 1,
-    borderTopColor: colors.line,
-  },
-});
+function makeStyles(colors) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.line,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      ...shadow.card,
+    },
+    cardTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+    labelWrap: { flexDirection: "row", alignItems: "center", gap: 6 },
+    label: { fontSize: 15.5, fontWeight: "800", color: colors.ink },
+    defaultTag: { backgroundColor: colors.brandSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill },
+    defaultTagText: { fontSize: 11, fontWeight: "700", color: colors.brand },
+    recipient: { fontSize: 14, fontWeight: "600", color: colors.ink, marginTop: 10 },
+    detail: { fontSize: 13.5, color: colors.muted, marginTop: 4, lineHeight: 20 },
+    actions: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: 14,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.line,
+    },
+    actionBtn: { flexDirection: "row", alignItems: "center", gap: 5 },
+    actionText: { fontSize: 13.5, fontWeight: "700", color: colors.brand },
+    empty: { alignItems: "center", paddingVertical: 60, gap: 12 },
+    emptyText: { fontSize: 14.5, color: colors.muted },
+    footer: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: 0,
+      padding: spacing.md,
+      backgroundColor: colors.bg,
+      borderTopWidth: 1,
+      borderTopColor: colors.line,
+    },
+  });
+}
