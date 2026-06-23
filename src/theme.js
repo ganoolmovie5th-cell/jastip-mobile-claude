@@ -1,4 +1,4 @@
-export const colors = {
+export const lightColors = {
   bg: "#faf6ee",
   surface: "#ffffff",
   tint: "#f1ece0",
@@ -12,6 +12,24 @@ export const colors = {
   accentStrong: "#cf6321",
   white: "#ffffff",
 };
+
+export const darkColors = {
+  bg: "#111916",
+  surface: "#182420",
+  tint: "#1e2e29",
+  ink: "#eeeae3",
+  muted: "#7d9189",
+  line: "#263530",
+  brand: "#1fb789",
+  brandStrong: "#19997a",
+  brandSoft: "#162d26",
+  accent: "#e8762f",
+  accentStrong: "#cf6321",
+  white: "#ffffff",
+};
+
+// Alias agar file yang belum dimigrasi tetap berjalan (selalu light)
+export const colors = lightColors;
 
 export const radius = {
   sm: 12,

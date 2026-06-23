@@ -269,9 +269,9 @@ export const aboutContent = {
     { label: "Rating", value: "4,9" },
   ],
   links: [
-    { id: "ig", label: "Instagram", icon: "logo-instagram", url: "https://instagram.com" },
-    { id: "tiktok", label: "TikTok", icon: "logo-tiktok", url: "https://tiktok.com" },
-    { id: "web", label: "Situs web", icon: "globe-outline", url: "https://jastipin.example" },
+    { id: "ig", label: "Instagram", icon: "logo-instagram", url: "https://instagram.com", disabled: true },
+    { id: "tiktok", label: "TikTok", icon: "logo-tiktok", url: "https://tiktok.com", disabled: true },
+    { id: "web", label: "Website", icon: "globe-outline", url: "https://jastip-claude.vercel.app/" },
   ],
   version: "1.0.0",
 };

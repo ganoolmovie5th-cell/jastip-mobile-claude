@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radius, spacing, shadow } from "../theme";
+import { radius, spacing, shadow } from "../theme";
+import { useAppTheme } from "../context/AppContext";
 import { useStore } from "../store/StoreContext";
 
 const FILTERS = [
@@ -13,6 +14,9 @@ const FILTERS = [
 
 export default function NotificationsScreen({ navigation }) {
   const { notifications, unreadCount, markNotificationRead, markAllNotificationsRead } = useStore();
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   const [filter, setFilter] = useState("all");
   const [newestFirst, setNewestFirst] = useState(true);
 
@@ -34,7 +38,6 @@ export default function NotificationsScreen({ navigation }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      {/* Aksi atas */}
       <View style={styles.topBar}>
         <Text style={styles.topText}>
           {unreadCount > 0 ? `${unreadCount} belum dibaca` : "Semua sudah dibaca"}
@@ -52,7 +55,6 @@ export default function NotificationsScreen({ navigation }) {
         </View>
       </View>
 
-      {/* Filter */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -65,8 +67,7 @@ export default function NotificationsScreen({ navigation }) {
           return (
             <Pressable key={f.id} onPress={() => setFilter(f.id)} style={[styles.chip, active && styles.chipActive]}>
               <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                {f.label}
-                {count ? ` (${count})` : ""}
+                {f.label}{count ? ` (${count})` : ""}
               </Text>
             </Pressable>
           );
@@ -87,9 +88,7 @@ export default function NotificationsScreen({ navigation }) {
               </View>
               <View style={{ flex: 1 }}>
                 <View style={styles.titleRow}>
-                  <Text style={styles.title} numberOfLines={1}>
-                    {n.title}
-                  </Text>
+                  <Text style={styles.title} numberOfLines={1}>{n.title}</Text>
                   {!n.read ? <View style={styles.unreadDot} /> : null}
                 </View>
                 <Text style={styles.body}>{n.body}</Text>
@@ -111,54 +110,64 @@ export default function NotificationsScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-  },
-  topText: { fontSize: 13, fontWeight: "700", color: colors.ink },
-  topActions: { flexDirection: "row", alignItems: "center", gap: 16 },
-  sortBtn: { flexDirection: "row", alignItems: "center", gap: 4 },
-  sortText: { fontSize: 13, fontWeight: "700", color: colors.brand },
-  markAll: { fontSize: 13, fontWeight: "700", color: colors.brand },
-  filterRow: { flexGrow: 0, marginBottom: spacing.sm },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.line,
-  },
-  chipActive: { backgroundColor: colors.brand, borderColor: colors.brand },
-  chipText: { fontSize: 13, fontWeight: "600", color: colors.muted },
-  chipTextActive: { color: colors.white },
-  card: {
-    flexDirection: "row",
-    gap: 12,
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    ...shadow.card,
-  },
-  cardUnread: { borderColor: colors.brandSoft, backgroundColor: "#fdfcf8" },
-  icon: { width: 42, height: 42, borderRadius: 13, backgroundColor: colors.tint, alignItems: "center", justifyContent: "center" },
-  iconUnread: { backgroundColor: colors.brandSoft },
-  titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  title: { flex: 1, fontSize: 14.5, fontWeight: "700", color: colors.ink },
-  unreadDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
-  body: { fontSize: 13, color: colors.muted, marginTop: 4, lineHeight: 19 },
-  footRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 8 },
-  time: { fontSize: 12, color: colors.muted },
-  tag: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: colors.brandSoft, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.pill },
-  tagText: { fontSize: 11.5, fontWeight: "700", color: colors.brand },
-  empty: { alignItems: "center", paddingVertical: 60, gap: 12 },
-  emptyText: { fontSize: 14.5, color: colors.muted },
-});
+function makeStyles(colors) {
+  return StyleSheet.create({
+    topBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.sm,
+    },
+    topText: { fontSize: 13, fontWeight: "700", color: colors.ink },
+    topActions: { flexDirection: "row", alignItems: "center", gap: 16 },
+    sortBtn: { flexDirection: "row", alignItems: "center", gap: 4 },
+    sortText: { fontSize: 13, fontWeight: "700", color: colors.brand },
+    markAll: { fontSize: 13, fontWeight: "700", color: colors.brand },
+    filterRow: { flexGrow: 0, marginBottom: spacing.sm },
+    chip: {
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: radius.pill,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.line,
+    },
+    chipActive: { backgroundColor: colors.brand, borderColor: colors.brand },
+    chipText: { fontSize: 13, fontWeight: "600", color: colors.muted },
+    chipTextActive: { color: colors.white },
+    card: {
+      flexDirection: "row",
+      gap: 12,
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.line,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      ...shadow.card,
+    },
+    cardUnread: { borderColor: colors.brandSoft, backgroundColor: colors.tint },
+    icon: { width: 42, height: 42, borderRadius: 13, backgroundColor: colors.tint, alignItems: "center", justifyContent: "center" },
+    iconUnread: { backgroundColor: colors.brandSoft },
+    titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+    title: { flex: 1, fontSize: 14.5, fontWeight: "700", color: colors.ink },
+    unreadDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
+    body: { fontSize: 13, color: colors.muted, marginTop: 4, lineHeight: 19 },
+    footRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 8 },
+    time: { fontSize: 12, color: colors.muted },
+    tag: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      backgroundColor: colors.brandSoft,
+      paddingHorizontal: 9,
+      paddingVertical: 4,
+      borderRadius: radius.pill,
+    },
+    tagText: { fontSize: 11.5, fontWeight: "700", color: colors.brand },
+    empty: { alignItems: "center", paddingVertical: 60, gap: 12 },
+    emptyText: { fontSize: 14.5, color: colors.muted },
+  });
+}

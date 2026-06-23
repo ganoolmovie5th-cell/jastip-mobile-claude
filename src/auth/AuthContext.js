@@ -20,7 +20,6 @@ export function AuthProvider({ children }) {
   const configured = isGoogleConfigured();
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: GOOGLE_CLIENT_IDS.web,
     webClientId: GOOGLE_CLIENT_IDS.web,
     androidClientId: GOOGLE_CLIENT_IDS.android,
     iosClientId: GOOGLE_CLIENT_IDS.ios,

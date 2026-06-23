@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radius, spacing, shadow } from "../theme";
+import { radius, spacing, shadow } from "../theme";
+import { useAppTheme } from "../context/AppContext";
 import { orderStatusMeta, formatRupiah, ORDER_TOTAL_STEPS, orderTotal } from "../data";
 import Button from "../components/Button";
 import { useAuth } from "../auth/AuthContext";
@@ -15,19 +16,11 @@ const FILTERS = [
   { id: "selesai", label: "Selesai" },
 ];
 
-function StatusBadge({ status }) {
-  const meta = orderStatusMeta[status] || orderStatusMeta.diproses;
-  return (
-    <View style={[styles.badge, { backgroundColor: meta.soft }]}>
-      <Ionicons name={meta.icon} size={13} color={meta.color} />
-      <Text style={[styles.badgeText, { color: meta.color }]}>{meta.label}</Text>
-    </View>
-  );
-}
-
 export default function OrdersScreen({ navigation }) {
   const { isSignedIn } = useAuth();
   const { orders } = useStore();
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [filter, setFilter] = useState("all");
 
   const visibleOrders = useMemo(
@@ -43,6 +36,8 @@ export default function OrdersScreen({ navigation }) {
         desc="Masuk dengan akun Google untuk melihat dan menyimpan pesananmu."
         actionLabel="Masuk"
         onAction={() => navigation.navigate("Login")}
+        colors={colors}
+        styles={styles}
       />
     );
   }
@@ -61,11 +56,7 @@ export default function OrdersScreen({ navigation }) {
         {FILTERS.map((f) => {
           const active = filter === f.id;
           return (
-            <Pressable
-              key={f.id}
-              onPress={() => setFilter(f.id)}
-              style={[styles.chip, active && styles.chipActive]}
-            >
+            <Pressable key={f.id} onPress={() => setFilter(f.id)} style={[styles.chip, active && styles.chipActive]}>
               <Text style={[styles.chipText, active && styles.chipTextActive]}>{f.label}</Text>
             </Pressable>
           );
@@ -80,6 +71,7 @@ export default function OrdersScreen({ navigation }) {
       ) : (
         visibleOrders.map((o) => {
           const total = orderTotal(o);
+          const meta = orderStatusMeta[o.status] || orderStatusMeta.diproses;
           return (
             <Pressable
               key={o.id}
@@ -88,7 +80,10 @@ export default function OrdersScreen({ navigation }) {
             >
               <View style={styles.cardTop}>
                 <Text style={styles.code}>{o.id}</Text>
-                <StatusBadge status={o.status} />
+                <View style={[styles.badge, { backgroundColor: meta.soft }]}>
+                  <Ionicons name={meta.icon} size={13} color={meta.color} />
+                  <Text style={[styles.badgeText, { color: meta.color }]}>{meta.label}</Text>
+                </View>
               </View>
               <Text style={styles.item}>{o.item}</Text>
               <View style={styles.metaRow}>
@@ -101,13 +96,9 @@ export default function OrdersScreen({ navigation }) {
               {o.status === "dikirim" || o.status === "diproses" ? (
                 <View style={styles.progressWrap}>
                   <View style={styles.progressTrack}>
-                    <View
-                      style={[styles.progressFill, { width: `${(o.currentStep / ORDER_TOTAL_STEPS) * 100}%` }]}
-                    />
+                    <View style={[styles.progressFill, { width: `${(o.currentStep / ORDER_TOTAL_STEPS) * 100}%` }]} />
                   </View>
-                  <Text style={styles.progressText}>
-                    Tahap {o.currentStep} dari {ORDER_TOTAL_STEPS}
-                  </Text>
+                  <Text style={styles.progressText}>Tahap {o.currentStep} dari {ORDER_TOTAL_STEPS}</Text>
                 </View>
               ) : null}
 
@@ -124,9 +115,7 @@ export default function OrdersScreen({ navigation }) {
                       : navigation.navigate("Lacak", { orderId: o.id })
                   }
                 >
-                  <Text style={styles.detailBtnText}>
-                    {o.status === "selesai" ? "Pesan lagi" : "Lacak"}
-                  </Text>
+                  <Text style={styles.detailBtnText}>{o.status === "selesai" ? "Pesan lagi" : "Lacak"}</Text>
                   <Ionicons name="chevron-forward" size={15} color={colors.brand} />
                 </Pressable>
               </View>
@@ -138,7 +127,7 @@ export default function OrdersScreen({ navigation }) {
   );
 }
 
-function EmptyState({ icon, title, desc, actionLabel, onAction }) {
+function EmptyState({ icon, title, desc, actionLabel, onAction, colors, styles }) {
   return (
     <View style={styles.empty}>
       <View style={styles.emptyIcon}>
@@ -151,64 +140,66 @@ function EmptyState({ icon, title, desc, actionLabel, onAction }) {
   );
 }
 
-const styles = StyleSheet.create({
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.line,
-  },
-  chipActive: { backgroundColor: colors.brand, borderColor: colors.brand },
-  chipText: { fontSize: 13.5, fontWeight: "600", color: colors.muted },
-  chipTextActive: { color: colors.white },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    ...shadow.card,
-  },
-  cardTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  code: { fontSize: 13, fontWeight: "700", color: colors.muted, letterSpacing: 0.3 },
-  badge: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: radius.pill },
-  badgeText: { fontSize: 12, fontWeight: "700" },
-  item: { fontSize: 16, fontWeight: "800", color: colors.ink, marginTop: 8 },
-  metaRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6, flexWrap: "wrap" },
-  meta: { fontSize: 12.5, color: colors.muted },
-  dot: { color: colors.muted, fontSize: 12 },
-  progressWrap: { marginTop: 14 },
-  progressTrack: { height: 6, borderRadius: 3, backgroundColor: colors.tint, overflow: "hidden" },
-  progressFill: { height: 6, borderRadius: 3, backgroundColor: colors.brand },
-  progressText: { fontSize: 12, color: colors.muted, marginTop: 6, fontWeight: "600" },
-  cardBottom: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 14,
-    paddingTop: 14,
-    borderTopWidth: 1,
-    borderTopColor: colors.line,
-  },
-  totalLabel: { fontSize: 12, color: colors.muted },
-  totalValue: { fontSize: 16, fontWeight: "800", color: colors.ink, marginTop: 2 },
-  detailBtn: { flexDirection: "row", alignItems: "center", gap: 2 },
-  detailBtnText: { fontSize: 14, fontWeight: "700", color: colors.brand },
-  emptyInline: { alignItems: "center", paddingVertical: 40, gap: 10 },
-  emptyInlineText: { fontSize: 14, color: colors.muted },
-  empty: { flex: 1, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center", padding: spacing.xl },
-  emptyIcon: {
-    width: 76,
-    height: 76,
-    borderRadius: 24,
-    backgroundColor: colors.brandSoft,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: spacing.md,
-  },
-  emptyTitle: { fontSize: 19, fontWeight: "800", color: colors.ink },
-  emptyDesc: { fontSize: 14.5, color: colors.muted, textAlign: "center", marginTop: 8, lineHeight: 21 },
-});
+function makeStyles(colors) {
+  return StyleSheet.create({
+    chip: {
+      paddingHorizontal: 16,
+      paddingVertical: 9,
+      borderRadius: radius.pill,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.line,
+    },
+    chipActive: { backgroundColor: colors.brand, borderColor: colors.brand },
+    chipText: { fontSize: 13.5, fontWeight: "600", color: colors.muted },
+    chipTextActive: { color: colors.white },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.line,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      ...shadow.card,
+    },
+    cardTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+    code: { fontSize: 13, fontWeight: "700", color: colors.muted, letterSpacing: 0.3 },
+    badge: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: radius.pill },
+    badgeText: { fontSize: 12, fontWeight: "700" },
+    item: { fontSize: 16, fontWeight: "800", color: colors.ink, marginTop: 8 },
+    metaRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6, flexWrap: "wrap" },
+    meta: { fontSize: 12.5, color: colors.muted },
+    dot: { color: colors.muted, fontSize: 12 },
+    progressWrap: { marginTop: 14 },
+    progressTrack: { height: 6, borderRadius: 3, backgroundColor: colors.tint, overflow: "hidden" },
+    progressFill: { height: 6, borderRadius: 3, backgroundColor: colors.brand },
+    progressText: { fontSize: 12, color: colors.muted, marginTop: 6, fontWeight: "600" },
+    cardBottom: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: 14,
+      paddingTop: 14,
+      borderTopWidth: 1,
+      borderTopColor: colors.line,
+    },
+    totalLabel: { fontSize: 12, color: colors.muted },
+    totalValue: { fontSize: 16, fontWeight: "800", color: colors.ink, marginTop: 2 },
+    detailBtn: { flexDirection: "row", alignItems: "center", gap: 2 },
+    detailBtnText: { fontSize: 14, fontWeight: "700", color: colors.brand },
+    emptyInline: { alignItems: "center", paddingVertical: 40, gap: 10 },
+    emptyInlineText: { fontSize: 14, color: colors.muted },
+    empty: { flex: 1, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center", padding: spacing.xl },
+    emptyIcon: {
+      width: 76,
+      height: 76,
+      borderRadius: 24,
+      backgroundColor: colors.brandSoft,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: spacing.md,
+    },
+    emptyTitle: { fontSize: 19, fontWeight: "800", color: colors.ink },
+    emptyDesc: { fontSize: 14.5, color: colors.muted, textAlign: "center", marginTop: 8, lineHeight: 21 },
+  });
+}

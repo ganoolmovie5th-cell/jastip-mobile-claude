@@ -1,35 +1,19 @@
 import React, { useMemo } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radius, spacing, shadow } from "../theme";
+import { radius, spacing, shadow } from "../theme";
+import { useAppTheme } from "../context/AppContext";
 import { buildTimeline, orderStatusMeta, orderTotal, formatRupiah } from "../data";
 import { useStore } from "../store/StoreContext";
 import Button from "../components/Button";
 import { openWhatsApp } from "../whatsapp";
 
-function StatusBadge({ status }) {
-  const meta = orderStatusMeta[status] || orderStatusMeta.diproses;
-  return (
-    <View style={[styles.badge, { backgroundColor: meta.soft }]}>
-      <Ionicons name={meta.icon} size={13} color={meta.color} />
-      <Text style={[styles.badgeText, { color: meta.color }]}>{meta.label}</Text>
-    </View>
-  );
-}
-
-function CostRow({ label, value, strong }) {
-  return (
-    <View style={styles.costRow}>
-      <Text style={[styles.costLabel, strong && styles.costLabelStrong]}>{label}</Text>
-      <Text style={[styles.costValue, strong && styles.costValueStrong]}>{value}</Text>
-    </View>
-  );
-}
-
 export default function OrderDetailScreen({ route, navigation }) {
   const { findOrder } = useStore();
   const order = findOrder(route.params?.orderId);
   const timeline = useMemo(() => buildTimeline(order), [order]);
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   if (!order) {
     return (
@@ -39,6 +23,8 @@ export default function OrderDetailScreen({ route, navigation }) {
       </View>
     );
   }
+
+  const meta = orderStatusMeta[order.status] || orderStatusMeta.diproses;
 
   return (
     <ScrollView
@@ -50,7 +36,10 @@ export default function OrderDetailScreen({ route, navigation }) {
       <View style={styles.card}>
         <View style={styles.headRow}>
           <Text style={styles.code}>{order.id}</Text>
-          <StatusBadge status={order.status} />
+          <View style={[styles.badge, { backgroundColor: meta.soft }]}>
+            <Ionicons name={meta.icon} size={13} color={meta.color} />
+            <Text style={[styles.badgeText, { color: meta.color }]}>{meta.label}</Text>
+          </View>
         </View>
         <Text style={styles.item}>{order.item}</Text>
         <View style={styles.metaRow}>
@@ -70,14 +59,14 @@ export default function OrderDetailScreen({ route, navigation }) {
       {/* Rincian biaya */}
       <Text style={styles.sectionTitle}>Rincian biaya</Text>
       <View style={styles.card}>
-        <CostRow label="Harga barang" value={formatRupiah(order.itemPrice)} />
-        <CostRow label="Biaya titip" value={formatRupiah(order.serviceFee)} />
-        <CostRow label="Ongkir" value={formatRupiah(order.shipping)} />
+        <CostRow label="Harga barang" value={formatRupiah(order.itemPrice)} colors={colors} styles={styles} />
+        <CostRow label="Biaya titip" value={formatRupiah(order.serviceFee)} colors={colors} styles={styles} />
+        <CostRow label="Ongkir" value={formatRupiah(order.shipping)} colors={colors} styles={styles} />
         <View style={styles.divider} />
-        <CostRow label="Total" value={formatRupiah(orderTotal(order))} strong />
+        <CostRow label="Total" value={formatRupiah(orderTotal(order))} strong colors={colors} styles={styles} />
       </View>
 
-      {/* Timeline penuh */}
+      {/* Timeline */}
       <Text style={styles.sectionTitle}>Status pengiriman</Text>
       <View style={styles.card}>
         {timeline.map((t, i) => {
@@ -100,7 +89,6 @@ export default function OrderDetailScreen({ route, navigation }) {
         })}
       </View>
 
-      {/* Aksi */}
       {order.status !== "selesai" ? (
         <Button
           label="Lacak pesanan ini"
@@ -127,40 +115,51 @@ export default function OrderDetailScreen({ route, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: spacing.md,
-    ...shadow.card,
-  },
-  headRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  code: { fontSize: 13, fontWeight: "700", color: colors.brand, letterSpacing: 0.4 },
-  item: { fontSize: 18, fontWeight: "800", color: colors.ink, marginTop: 8 },
-  metaRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8 },
-  meta: { fontSize: 13.5, color: colors.muted },
-  sectionTitle: { fontSize: 16, fontWeight: "800", color: colors.ink, marginTop: spacing.lg, marginBottom: spacing.sm },
-  costRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 6 },
-  costLabel: { fontSize: 14, color: colors.muted },
-  costLabelStrong: { fontSize: 15, fontWeight: "800", color: colors.ink },
-  costValue: { fontSize: 14, fontWeight: "600", color: colors.ink },
-  costValueStrong: { fontSize: 17, fontWeight: "800", color: colors.brand },
-  divider: { height: 1, backgroundColor: colors.line, marginVertical: 8 },
-  badge: { flexDirection: "row", alignItems: "center", gap: 5, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 5 },
-  badgeText: { fontSize: 12, fontWeight: "700" },
-  tlRow: { flexDirection: "row", gap: 12 },
-  tlLeft: { alignItems: "center", width: 24 },
-  dotMark: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-  dotDone: { backgroundColor: colors.brand },
-  dotPending: { backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.line },
-  dotActive: { borderWidth: 3, borderColor: colors.brandSoft },
-  line: { width: 2, flex: 1, marginVertical: 2 },
-  lineDone: { backgroundColor: colors.brand },
-  linePending: { backgroundColor: colors.line },
-  tlTitle: { fontSize: 14.5, fontWeight: "700", color: colors.ink },
-  tlDate: { fontSize: 12.5, color: colors.muted, marginTop: 2 },
-  empty: { flex: 1, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center", gap: 12 },
-  emptyText: { fontSize: 14.5, color: colors.muted },
-});
+function CostRow({ label, value, strong, colors, styles }) {
+  return (
+    <View style={styles.costRow}>
+      <Text style={[styles.costLabel, strong && styles.costLabelStrong]}>{label}</Text>
+      <Text style={[styles.costValue, strong && styles.costValueStrong]}>{value}</Text>
+    </View>
+  );
+}
+
+function makeStyles(colors) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.line,
+      padding: spacing.md,
+      ...shadow.card,
+    },
+    headRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+    code: { fontSize: 13, fontWeight: "700", color: colors.brand, letterSpacing: 0.4 },
+    item: { fontSize: 18, fontWeight: "800", color: colors.ink, marginTop: 8 },
+    metaRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8 },
+    meta: { fontSize: 13.5, color: colors.muted },
+    badge: { flexDirection: "row", alignItems: "center", gap: 5, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 5 },
+    badgeText: { fontSize: 12, fontWeight: "700" },
+    sectionTitle: { fontSize: 16, fontWeight: "800", color: colors.ink, marginTop: spacing.lg, marginBottom: spacing.sm },
+    costRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 6 },
+    costLabel: { fontSize: 14, color: colors.muted },
+    costLabelStrong: { fontSize: 15, fontWeight: "800", color: colors.ink },
+    costValue: { fontSize: 14, fontWeight: "600", color: colors.ink },
+    costValueStrong: { fontSize: 17, fontWeight: "800", color: colors.brand },
+    divider: { height: 1, backgroundColor: colors.line, marginVertical: 8 },
+    tlRow: { flexDirection: "row", gap: 12 },
+    tlLeft: { alignItems: "center", width: 24 },
+    dotMark: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+    dotDone: { backgroundColor: colors.brand },
+    dotPending: { backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.line },
+    dotActive: { borderWidth: 3, borderColor: colors.brandSoft },
+    line: { width: 2, flex: 1, marginVertical: 2 },
+    lineDone: { backgroundColor: colors.brand },
+    linePending: { backgroundColor: colors.line },
+    tlTitle: { fontSize: 14.5, fontWeight: "700", color: colors.ink },
+    tlDate: { fontSize: 12.5, color: colors.muted, marginTop: 2 },
+    empty: { flex: 1, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center", gap: 12 },
+    emptyText: { fontSize: 14.5, color: colors.muted },
+  });
+}
