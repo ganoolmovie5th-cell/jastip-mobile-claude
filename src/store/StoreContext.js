@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { loadJSON, saveJSON, STORAGE_KEYS } from "../storage";
-import { seedAddresses, seedPayments } from "../data";
+import { seedAddresses, seedPayments, seedNotifications } from "../data";
 
 const StoreContext = createContext(null);
 
@@ -14,14 +14,17 @@ function makeId(prefix) {
 export function StoreProvider({ children }) {
   const [addresses, setAddresses] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     (async () => {
       const a = await loadJSON(STORAGE_KEYS.addresses, null);
       const p = await loadJSON(STORAGE_KEYS.payments, null);
+      const n = await loadJSON(STORAGE_KEYS.notifications, null);
       setAddresses(a ?? seedAddresses);
       setPayments(p ?? seedPayments);
+      setNotifications(n ?? seedNotifications);
       setReady(true);
     })();
   }, []);
@@ -33,6 +36,9 @@ export function StoreProvider({ children }) {
   useEffect(() => {
     if (ready) saveJSON(STORAGE_KEYS.payments, payments);
   }, [payments, ready]);
+  useEffect(() => {
+    if (ready) saveJSON(STORAGE_KEYS.notifications, notifications);
+  }, [notifications, ready]);
 
   // ----- Alamat -----
   const upsertAddress = useCallback((addr) => {
@@ -87,16 +93,31 @@ export function StoreProvider({ children }) {
     setPayments((prev) => prev.map((x) => ({ ...x, isDefault: x.id === id })));
   }, []);
 
+  // ----- Notifikasi -----
+  const markNotificationRead = useCallback((id) => {
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+  }, []);
+
+  const markAllNotificationsRead = useCallback(() => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  }, []);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
   const value = {
     ready,
     addresses,
     payments,
+    notifications,
+    unreadCount,
     upsertAddress,
     removeAddress,
     setDefaultAddress,
     addPayment,
     removePayment,
     setDefaultPayment,
+    markNotificationRead,
+    markAllNotificationsRead,
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

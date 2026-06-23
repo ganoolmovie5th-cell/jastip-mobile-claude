@@ -19,10 +19,12 @@ import Button from "../components/Button";
 import SectionHeader from "../components/SectionHeader";
 import { openWhatsApp } from "../whatsapp";
 import { useAuth } from "../auth/AuthContext";
+import { useStore } from "../store/StoreContext";
 
 export default function HomeScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { isSignedIn, user, signInWithGoogle, signingIn } = useAuth();
+  const { unreadCount } = useStore();
 
   const firstName = (user?.name || "").trim().split(/\s+/)[0];
 
@@ -47,8 +49,13 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.brandName}>Jastipin</Text>
         </View>
         <View style={styles.topRight}>
-          <Pressable style={styles.bell} hitSlop={8}>
+          <Pressable style={styles.bell} hitSlop={8} onPress={() => navigation.navigate("Notifications")}>
             <Ionicons name="notifications-outline" size={22} color={colors.ink} />
+            {unreadCount > 0 ? (
+              <View style={styles.bellBadge}>
+                <Text style={styles.bellBadgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
+              </View>
+            ) : null}
           </Pressable>
           {isSignedIn ? (
             <Pressable hitSlop={8} onPress={() => navigation.navigate("Profil")}>
@@ -367,6 +374,21 @@ const styles = StyleSheet.create({
   signinTitle: { fontSize: 15, fontWeight: "800", color: colors.ink },
   signinDesc: { fontSize: 12.5, color: colors.muted, marginTop: 3, lineHeight: 18 },
   topRight: { flexDirection: "row", alignItems: "center", gap: 12 },
+  bellBadge: {
+    position: "absolute",
+    top: -4,
+    right: -4,
+    minWidth: 17,
+    height: 17,
+    borderRadius: 9,
+    paddingHorizontal: 4,
+    backgroundColor: colors.accent,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1.5,
+    borderColor: colors.bg,
+  },
+  bellBadgeText: { color: colors.white, fontSize: 10, fontWeight: "800" },
   topAva: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.tint },
   topAvaFallback: { backgroundColor: colors.brand, alignItems: "center", justifyContent: "center" },
   topAvaText: { color: colors.white, fontWeight: "800", fontSize: 14 },

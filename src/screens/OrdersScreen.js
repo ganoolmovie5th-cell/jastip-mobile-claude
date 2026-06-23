@@ -79,7 +79,11 @@ export default function OrdersScreen({ navigation }) {
         orders.map((o) => {
           const total = orderTotal(o);
           return (
-            <View key={o.id} style={styles.card}>
+            <Pressable
+              key={o.id}
+              style={styles.card}
+              onPress={() => navigation.navigate("OrderDetail", { orderId: o.id })}
+            >
               <View style={styles.cardTop}>
                 <Text style={styles.code}>{o.id}</Text>
                 <StatusBadge status={o.status} />
@@ -124,7 +128,7 @@ export default function OrdersScreen({ navigation }) {
                   <Ionicons name="chevron-forward" size={15} color={colors.brand} />
                 </Pressable>
               </View>
-            </View>
+            </Pressable>
           );
         })
       )}

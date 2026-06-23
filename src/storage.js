@@ -34,4 +34,5 @@ export const STORAGE_KEYS = {
   user: "jastipin.user",
   addresses: "jastipin.addresses",
   payments: "jastipin.payments",
+  notifications: "jastipin.notifications",
 };

@@ -277,3 +277,43 @@ export const aboutContent = {
 export function formatRupiah(n) {
   return "Rp" + n.toLocaleString("id-ID");
 }
+
+// Notifikasi awal (contoh), nyambung dengan data pesanan di myOrders.
+export const seedNotifications = [
+  {
+    id: "n1",
+    orderId: "JTP-205622",
+    read: false,
+    icon: "time-outline",
+    title: "Pesanan sedang diproses",
+    time: "Baru saja",
+    body: "JTP-205622 (Wireless earbuds) sedang kami siapkan. Kami kabari di tiap tahap.",
+  },
+  {
+    id: "n2",
+    orderId: "JTP-204815",
+    read: false,
+    icon: "airplane-outline",
+    title: "Pesanan dikirim dari luar negeri",
+    time: "2 hari lalu",
+    body: "JTP-204815 sudah dikirim dari Seoul. Estimasi tiba di gudang Indonesia 24 Jun.",
+  },
+  {
+    id: "n3",
+    orderId: "JTP-203190",
+    read: true,
+    icon: "checkmark-done-outline",
+    title: "Pesanan selesai",
+    time: "4 Jun",
+    body: "JTP-203190 (Sneakers rilisan terbatas) sudah diterima. Terima kasih sudah nitip!",
+  },
+  {
+    id: "n4",
+    orderId: null,
+    read: true,
+    icon: "pricetag-outline",
+    title: "Promo ongkir hemat",
+    time: "1 Mei",
+    body: "Diskon ongkir 20% untuk titipan dari Jepang & Korea sepanjang bulan ini.",
+  },
+];

@@ -10,12 +10,14 @@ import { colors } from "./src/theme";
 import { AuthProvider } from "./src/auth/AuthContext";
 import { StoreProvider } from "./src/store/StoreContext";
 import HomeScreen from "./src/screens/HomeScreen";
+import NotificationsScreen from "./src/screens/NotificationsScreen";
 import CategoriesScreen from "./src/screens/CategoriesScreen";
 import CategoryDetailScreen from "./src/screens/CategoryDetailScreen";
 import TrackScreen from "./src/screens/TrackScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
 import LoginScreen from "./src/screens/LoginScreen";
 import OrdersScreen from "./src/screens/OrdersScreen";
+import OrderDetailScreen from "./src/screens/OrderDetailScreen";
 import AddressScreen from "./src/screens/AddressScreen";
 import AddressFormScreen from "./src/screens/AddressFormScreen";
 import PaymentScreen from "./src/screens/PaymentScreen";
@@ -38,6 +40,15 @@ const stackScreenOptions = {
   contentStyle: { backgroundColor: colors.bg },
 };
 
+function HomeStack() {
+  return (
+    <Stack.Navigator screenOptions={stackScreenOptions}>
+      <Stack.Screen name="BerandaHome" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: "Notifikasi" }} />
+    </Stack.Navigator>
+  );
+}
+
 function CategoriesStack() {
   return (
     <Stack.Navigator screenOptions={stackScreenOptions}>
@@ -57,6 +68,7 @@ function ProfileStack() {
       <Stack.Screen name="ProfileHome" component={ProfileScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Login" component={LoginScreen} options={{ title: "Masuk" }} />
       <Stack.Screen name="Orders" component={OrdersScreen} options={{ title: "Pesanan saya" }} />
+      <Stack.Screen name="OrderDetail" component={OrderDetailScreen} options={{ title: "Detail pesanan" }} />
       <Stack.Screen name="Address" component={AddressScreen} options={{ title: "Alamat pengiriman" }} />
       <Stack.Screen name="AddressForm" component={AddressFormScreen} options={{ title: "Alamat" }} />
       <Stack.Screen name="Payment" component={PaymentScreen} options={{ title: "Metode pembayaran" }} />
@@ -99,7 +111,7 @@ export default function App() {
                 },
               })}
             >
-              <Tab.Screen name="Beranda" component={HomeScreen} />
+              <Tab.Screen name="Beranda" component={HomeStack} />
               <Tab.Screen name="Kategori" component={CategoriesStack} />
               <Tab.Screen name="Lacak" component={TrackScreen} />
               <Tab.Screen name="Profil" component={ProfileStack} />
