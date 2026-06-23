@@ -12,6 +12,11 @@ WebBrowser.maybeCompleteAuthSession();
 
 const AuthContext = createContext(null);
 
+// Redirect URI untuk Expo Go — harus HTTPS, bukan exp://
+// URI ini wajib didaftarkan di Google Cloud Console → OAuth Client (Web Application)
+// → Authorized redirect URIs
+const REDIRECT_URI = "https://auth.expo.io/@ganoolmovie5th/jastip-mobile-claude";
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,6 +28,7 @@ export function AuthProvider({ children }) {
     webClientId: GOOGLE_CLIENT_IDS.web,
     androidClientId: GOOGLE_CLIENT_IDS.android,
     iosClientId: GOOGLE_CLIENT_IDS.ios,
+    redirectUri: REDIRECT_URI,
     scopes: ["profile", "email"],
   });
 
