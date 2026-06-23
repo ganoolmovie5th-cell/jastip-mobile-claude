@@ -2,7 +2,8 @@ import React, { useMemo } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, radius, spacing, shadow } from "../theme";
-import { getOrderById, buildTimeline, orderStatusMeta, orderTotal, formatRupiah } from "../data";
+import { buildTimeline, orderStatusMeta, orderTotal, formatRupiah } from "../data";
+import { useStore } from "../store/StoreContext";
 import Button from "../components/Button";
 import { openWhatsApp } from "../whatsapp";
 
@@ -26,7 +27,8 @@ function CostRow({ label, value, strong }) {
 }
 
 export default function OrderDetailScreen({ route, navigation }) {
-  const order = getOrderById(route.params?.orderId);
+  const { findOrder } = useStore();
+  const order = findOrder(route.params?.orderId);
   const timeline = useMemo(() => buildTimeline(order), [order]);
 
   if (!order) {

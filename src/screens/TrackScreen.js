@@ -3,16 +3,17 @@ import { View, Text, ScrollView, StyleSheet, TextInput, Pressable } from "react-
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, radius, spacing, shadow } from "../theme";
-import { myOrders, getOrderById, buildTimeline, orderStatusMeta, orderTotal, formatRupiah } from "../data";
-
-function defaultOrder() {
-  const active = myOrders.find((o) => o.status === "diproses" || o.status === "dikirim");
-  return (active || myOrders[0])?.id || null;
-}
+import { buildTimeline, orderStatusMeta, orderTotal, formatRupiah } from "../data";
+import { useStore } from "../store/StoreContext";
 
 export default function TrackScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
-  const [selectedId, setSelectedId] = useState(route.params?.orderId || defaultOrder());
+  const { orders, findOrder } = useStore();
+  const initialId =
+    route.params?.orderId ||
+    (orders.find((o) => o.status === "diproses" || o.status === "dikirim") || orders[0])?.id ||
+    null;
+  const [selectedId, setSelectedId] = useState(initialId);
   const [query, setQuery] = useState("");
 
   // Kalau dibuka dari "Pesanan saya" dengan kode tertentu, ikuti pilihan itu.
@@ -20,14 +21,14 @@ export default function TrackScreen({ route, navigation }) {
     if (route.params?.orderId) setSelectedId(route.params.orderId);
   }, [route.params?.orderId]);
 
-  const order = getOrderById(selectedId);
+  const order = findOrder(selectedId);
   const timeline = useMemo(() => buildTimeline(order), [order]);
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return myOrders;
-    return myOrders.filter((o) => o.id.toLowerCase().includes(q) || o.item.toLowerCase().includes(q));
-  }, [query]);
+    if (!q) return orders;
+    return orders.filter((o) => o.id.toLowerCase().includes(q) || o.item.toLowerCase().includes(q));
+  }, [query, orders]);
 
   return (
     <ScrollView

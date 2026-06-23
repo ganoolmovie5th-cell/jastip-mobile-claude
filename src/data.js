@@ -85,10 +85,10 @@ export const profileMenu = [
   { id: "about", label: "Tentang Jastipin", icon: "information-circle-outline", route: "About" },
 ];
 
-// Sumber tunggal data pesanan (dipakai layar "Pesanan saya" DAN "Lacak").
+// Sumber data pesanan awal (di-seed ke StoreContext, lalu jadi state hidup).
 // Status: diproses | dikirim | selesai | dibatalkan
 // stageDates sejajar dengan ORDER_STAGES; status "done" dihitung dari currentStep.
-export const myOrders = [
+export const seedOrders = [
   {
     id: "JTP-204815",
     item: "Serum hyaluronic + cushion compact",
@@ -157,9 +157,11 @@ export const orderStatusMeta = {
 // Total tahapan (dipakai progress bar di "Pesanan saya" dan timeline di "Lacak").
 export const ORDER_TOTAL_STEPS = ORDER_STAGES.length;
 
-// Ambil satu pesanan berdasarkan kode.
-export function getOrderById(id) {
-  return myOrders.find((o) => o.id === id) || null;
+// Tentukan status berdasarkan tahap saat ini.
+export function statusForStep(step) {
+  if (step >= ORDER_TOTAL_STEPS) return "selesai";
+  if (step <= 1) return "diproses";
+  return "dikirim";
 }
 
 // Bentuk timeline lengkap dari satu pesanan (status "done" dihitung dari currentStep).
@@ -278,7 +280,10 @@ export function formatRupiah(n) {
   return "Rp" + n.toLocaleString("id-ID");
 }
 
-// Notifikasi awal (contoh), nyambung dengan data pesanan di myOrders.
+// Notifikasi awal (contoh), nyambung dengan data pesanan di seedOrders.
+const _now = Date.now();
+const _min = 60 * 1000;
+const _day = 24 * 60 * _min;
 export const seedNotifications = [
   {
     id: "n1",
@@ -287,6 +292,7 @@ export const seedNotifications = [
     icon: "time-outline",
     title: "Pesanan sedang diproses",
     time: "Baru saja",
+    ts: _now - 2 * _min,
     body: "JTP-205622 (Wireless earbuds) sedang kami siapkan. Kami kabari di tiap tahap.",
   },
   {
@@ -296,6 +302,7 @@ export const seedNotifications = [
     icon: "airplane-outline",
     title: "Pesanan dikirim dari luar negeri",
     time: "2 hari lalu",
+    ts: _now - 2 * _day,
     body: "JTP-204815 sudah dikirim dari Seoul. Estimasi tiba di gudang Indonesia 24 Jun.",
   },
   {
@@ -305,6 +312,7 @@ export const seedNotifications = [
     icon: "checkmark-done-outline",
     title: "Pesanan selesai",
     time: "4 Jun",
+    ts: _now - 19 * _day,
     body: "JTP-203190 (Sneakers rilisan terbatas) sudah diterima. Terima kasih sudah nitip!",
   },
   {
@@ -314,6 +322,7 @@ export const seedNotifications = [
     icon: "pricetag-outline",
     title: "Promo ongkir hemat",
     time: "1 Mei",
+    ts: _now - 53 * _day,
     body: "Diskon ongkir 20% untuk titipan dari Jepang & Korea sepanjang bulan ini.",
   },
 ];

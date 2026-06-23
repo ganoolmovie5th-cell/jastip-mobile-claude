@@ -2,9 +2,10 @@ import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, radius, spacing, shadow } from "../theme";
-import { myOrders, orderStatusMeta, formatRupiah, ORDER_TOTAL_STEPS, orderTotal } from "../data";
+import { orderStatusMeta, formatRupiah, ORDER_TOTAL_STEPS, orderTotal } from "../data";
 import Button from "../components/Button";
 import { useAuth } from "../auth/AuthContext";
+import { useStore } from "../store/StoreContext";
 import { openWhatsApp } from "../whatsapp";
 
 const FILTERS = [
@@ -26,11 +27,12 @@ function StatusBadge({ status }) {
 
 export default function OrdersScreen({ navigation }) {
   const { isSignedIn } = useAuth();
+  const { orders } = useStore();
   const [filter, setFilter] = useState("all");
 
-  const orders = useMemo(
-    () => (filter === "all" ? myOrders : myOrders.filter((o) => o.status === filter)),
-    [filter]
+  const visibleOrders = useMemo(
+    () => (filter === "all" ? orders : orders.filter((o) => o.status === filter)),
+    [filter, orders]
   );
 
   if (!isSignedIn) {
@@ -70,13 +72,13 @@ export default function OrdersScreen({ navigation }) {
         })}
       </ScrollView>
 
-      {orders.length === 0 ? (
+      {visibleOrders.length === 0 ? (
         <View style={styles.emptyInline}>
           <Ionicons name="receipt-outline" size={40} color={colors.muted} />
           <Text style={styles.emptyInlineText}>Belum ada pesanan di status ini.</Text>
         </View>
       ) : (
-        orders.map((o) => {
+        visibleOrders.map((o) => {
           const total = orderTotal(o);
           return (
             <Pressable
