@@ -1,6 +1,6 @@
 // Auth context: login Gmail lewat OAuth, kompatibel Expo Go SDK 50+.
 // Menggunakan WebBrowser.openAuthSessionAsync langsung (tanpa proxy auth.expo.io
-// yang sudah deprecated) dengan callback page di GitHub Pages.
+// yang sudah deprecated) dengan callback page di Vercel.
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { Alert } from "react-native";
@@ -13,9 +13,28 @@ WebBrowser.maybeCompleteAuthSession();
 
 const AuthContext = createContext(null);
 
-// Callback page di GitHub Pages — HARUS didaftarkan di Google Cloud Console
-// → Credentials → Web Application → Authorized redirect URIs
-const CALLBACK_URL = "https://jastip-in.web.id/callback.html";
+// Callback page di Vercel — HARUS didaftarkan persis seperti ini di Google Cloud
+// Console → Credentials → Web Application → Authorized redirect URIs.
+// Catatan: pakai domain Vercel yang melayani 200 langsung. Jangan pakai
+// https://jastip-in.web.id/callback.html karena domain apex itu 308-redirect ke
+// www, dan in-app browser bisa membuang fragment #access_token saat redirect.
+const CALLBACK_URL = "https://jastip-claude.vercel.app/callback.html";
+
+// Ambil access_token dari URL balikan, baik di query (?...) maupun fragment (#...).
+function extractAccessToken(url) {
+  if (!url) return null;
+  const tryParse = (str) => {
+    if (!str) return null;
+    try {
+      return new URLSearchParams(str).get("access_token");
+    } catch {
+      return null;
+    }
+  };
+  const hashPart  = url.includes("#") ? url.split("#")[1] : "";
+  const queryPart = url.includes("?") ? url.split("?")[1].split("#")[0] : "";
+  return tryParse(queryPart) || tryParse(hashPart);
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null);
@@ -84,19 +103,32 @@ export function AuthProvider({ children }) {
       const result = await WebBrowser.openAuthSessionAsync(authUrl, appUrl);
 
       if (result.type === "success" && result.url) {
-        // result.url = exp://IP:PORT?access_token=xxx
-        const queryStr   = result.url.split("?")[1] || "";
-        const urlParams  = new URLSearchParams(queryStr);
-        const token      = urlParams.get("access_token");
+        // result.url bisa berbentuk exp://IP:PORT?access_token=xxx
+        // atau exp://IP:PORT#access_token=xxx — ambil token dari keduanya.
+        const token = extractAccessToken(result.url);
         if (token) {
           await fetchProfile(token);
           return;
         }
+        setSigningIn(false);
+        Alert.alert(
+          "Login gagal",
+          "Token tidak ditemukan setelah kembali dari Google. Pastikan URL callback sudah terdaftar di Google Cloud Console."
+        );
+        return;
       }
+
+      // type: cancel / dismiss / locked — beri info yang jelas
       setSigningIn(false);
-    } catch {
+      if (result.type !== "cancel" && result.type !== "dismiss") {
+        Alert.alert("Login gagal", "Sesi login tidak selesai. Coba lagi ya.");
+      }
+    } catch (err) {
       setSigningIn(false);
-      Alert.alert("Login gagal", "Terjadi masalah saat membuka Google. Coba lagi ya.");
+      Alert.alert(
+        "Login gagal",
+        "Terjadi masalah saat membuka Google. Coba lagi ya.\n\n" + String(err?.message || err)
+      );
     }
   }, [configured]);
 
