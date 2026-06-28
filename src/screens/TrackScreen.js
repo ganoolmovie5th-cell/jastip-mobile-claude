@@ -4,8 +4,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing, shadow } from "../theme";
 import { useAppTheme } from "../context/AppContext";
-import { buildTimeline, orderStatusMeta, orderTotal, formatRupiah } from "../data";
+import { buildTimeline, orderTotal, formatRupiah } from "../data";
 import { useStore } from "../store/StoreContext";
+import StatusBadge from "../components/StatusBadge";
+import OrderTimeline from "../components/OrderTimeline";
 
 export default function TrackScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
@@ -100,7 +102,7 @@ export default function TrackScreen({ route, navigation }) {
                 {order.item}
               </Text>
             </View>
-            <StatusBadge status={order.status} styles={styles} />
+            <StatusBadge status={order.status} />
           </View>
 
           <View style={styles.originRow}>
@@ -116,24 +118,7 @@ export default function TrackScreen({ route, navigation }) {
 
           {/* Timeline */}
           <View style={{ marginTop: spacing.md }}>
-            {timeline.map((t_item, i) => {
-              const last = i === timeline.length - 1;
-              const active = t_item.id === order.currentStep;
-              return (
-                <View key={t_item.id} style={styles.tlRow}>
-                  <View style={styles.tlLeft}>
-                    <View style={[styles.dotMark, t_item.done ? styles.dotDone : styles.dotPending, active && styles.dotActive]}>
-                      {t_item.done ? <Ionicons name="checkmark" size={13} color={colors.white} /> : null}
-                    </View>
-                    {!last ? <View style={[styles.line, t_item.done ? styles.lineDone : styles.linePending]} /> : null}
-                  </View>
-                  <View style={{ flex: 1, paddingBottom: last ? 0 : spacing.md }}>
-                    <Text style={[styles.tlTitle, active && { color: colors.brand }]}>{t_item.title}</Text>
-                    <Text style={styles.tlDate}>{t_item.date}</Text>
-                  </View>
-                </View>
-              );
-            })}
+            <OrderTimeline timeline={timeline} currentStep={order.currentStep} />
           </View>
 
           <View style={styles.totalRow}>
@@ -145,16 +130,6 @@ export default function TrackScreen({ route, navigation }) {
 
       <Text style={styles.hint}>{t("track.hint")}</Text>
     </ScrollView>
-  );
-}
-
-function StatusBadge({ status, styles }) {
-  const meta = orderStatusMeta[status] || orderStatusMeta.diproses;
-  return (
-    <View style={[styles.badge, { backgroundColor: meta.soft }]}>
-      <Ionicons name={meta.icon} size={13} color={meta.color} />
-      <Text style={[styles.badgeText, { color: meta.color }]}>{meta.label}</Text>
-    </View>
   );
 }
 
@@ -196,22 +171,9 @@ function makeStyles(colors) {
     cardTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", gap: 10 },
     code: { fontSize: 13, fontWeight: "700", color: colors.brand, letterSpacing: 0.4 },
     item: { fontSize: 15, fontWeight: "700", color: colors.ink, marginTop: 3 },
-    badge: { flexDirection: "row", alignItems: "center", gap: 5, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 5 },
-    badgeText: { fontSize: 12, fontWeight: "700" },
     originRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 10, flexWrap: "wrap" },
     origin: { fontSize: 13, color: colors.muted },
     dot: { color: colors.muted, fontSize: 12 },
-    tlRow: { flexDirection: "row", gap: 12 },
-    tlLeft: { alignItems: "center", width: 24 },
-    dotMark: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-    dotDone: { backgroundColor: colors.brand },
-    dotPending: { backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.line },
-    dotActive: { borderWidth: 3, borderColor: colors.brandSoft },
-    line: { width: 2, flex: 1, marginVertical: 2 },
-    lineDone: { backgroundColor: colors.brand },
-    linePending: { backgroundColor: colors.line },
-    tlTitle: { fontSize: 14.5, fontWeight: "700", color: colors.ink },
-    tlDate: { fontSize: 12.5, color: colors.muted, marginTop: 2 },
     totalRow: {
       flexDirection: "row",
       alignItems: "center",

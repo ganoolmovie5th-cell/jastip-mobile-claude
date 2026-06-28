@@ -166,3 +166,11 @@ Hapus over-engineering tanpa mengubah perilaku. Verifikasi `npx expo export --pl
 - Lepas dependency tak terpakai: `expo-auth-session`, `expo-crypto` (auth di-hand-roll pakai `WebBrowser`+`fetch`), `expo-dev-client` (workflow Expo Go).
 - `App.js`: satukan `screenOpts` 3× → `makeScreenOpts(colors)`; buang key ICONS Inggris (`Home`/`Categories`/`Track`/`Profile`) yang tak match route Indonesia.
 - `src/theme.js`: hapus alias mati `export const colors = lightColors` (0 importer; semua pakai `useAppTheme`).
+
+## Dedup Komponen Pesanan (Juni 2026)
+
+Timeline pengiriman & badge status yang sebelumnya disalin identik di `TrackScreen` dan `OrderDetailScreen` diekstrak jadi komponen reusable:
+- `src/components/StatusBadge.js`
+- `src/components/OrderTimeline.js`
+
+Verifikasi: `npx expo export --platform android` sukses ("Exported: dist").

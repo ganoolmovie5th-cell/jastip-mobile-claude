@@ -3,9 +3,11 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing, shadow } from "../theme";
 import { useAppTheme } from "../context/AppContext";
-import { buildTimeline, orderStatusMeta, orderTotal, formatRupiah } from "../data";
+import { buildTimeline, orderTotal, formatRupiah } from "../data";
 import { useStore } from "../store/StoreContext";
 import Button from "../components/Button";
+import StatusBadge from "../components/StatusBadge";
+import OrderTimeline from "../components/OrderTimeline";
 import { openWhatsApp } from "../whatsapp";
 
 export default function OrderDetailScreen({ route, navigation }) {
@@ -24,8 +26,6 @@ export default function OrderDetailScreen({ route, navigation }) {
     );
   }
 
-  const meta = orderStatusMeta[order.status] || orderStatusMeta.diproses;
-
   return (
     <ScrollView
       style={{ backgroundColor: colors.bg }}
@@ -36,10 +36,7 @@ export default function OrderDetailScreen({ route, navigation }) {
       <View style={styles.card}>
         <View style={styles.headRow}>
           <Text style={styles.code}>{order.id}</Text>
-          <View style={[styles.badge, { backgroundColor: meta.soft }]}>
-            <Ionicons name={meta.icon} size={13} color={meta.color} />
-            <Text style={[styles.badgeText, { color: meta.color }]}>{meta.label}</Text>
-          </View>
+          <StatusBadge status={order.status} />
         </View>
         <Text style={styles.item}>{order.item}</Text>
         <View style={styles.metaRow}>
@@ -69,24 +66,7 @@ export default function OrderDetailScreen({ route, navigation }) {
       {/* Timeline */}
       <Text style={styles.sectionTitle}>Status pengiriman</Text>
       <View style={styles.card}>
-        {timeline.map((t, i) => {
-          const last = i === timeline.length - 1;
-          const active = t.id === order.currentStep;
-          return (
-            <View key={t.id} style={styles.tlRow}>
-              <View style={styles.tlLeft}>
-                <View style={[styles.dotMark, t.done ? styles.dotDone : styles.dotPending, active && styles.dotActive]}>
-                  {t.done ? <Ionicons name="checkmark" size={13} color={colors.white} /> : null}
-                </View>
-                {!last ? <View style={[styles.line, t.done ? styles.lineDone : styles.linePending]} /> : null}
-              </View>
-              <View style={{ flex: 1, paddingBottom: last ? 0 : spacing.md }}>
-                <Text style={[styles.tlTitle, active && { color: colors.brand }]}>{t.title}</Text>
-                <Text style={styles.tlDate}>{t.date}</Text>
-              </View>
-            </View>
-          );
-        })}
+        <OrderTimeline timeline={timeline} currentStep={order.currentStep} />
       </View>
 
       {order.status !== "selesai" ? (
@@ -139,8 +119,6 @@ function makeStyles(colors) {
     item: { fontSize: 18, fontWeight: "800", color: colors.ink, marginTop: 8 },
     metaRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8 },
     meta: { fontSize: 13.5, color: colors.muted },
-    badge: { flexDirection: "row", alignItems: "center", gap: 5, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 5 },
-    badgeText: { fontSize: 12, fontWeight: "700" },
     sectionTitle: { fontSize: 16, fontWeight: "800", color: colors.ink, marginTop: spacing.lg, marginBottom: spacing.sm },
     costRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 6 },
     costLabel: { fontSize: 14, color: colors.muted },
@@ -148,17 +126,6 @@ function makeStyles(colors) {
     costValue: { fontSize: 14, fontWeight: "600", color: colors.ink },
     costValueStrong: { fontSize: 17, fontWeight: "800", color: colors.brand },
     divider: { height: 1, backgroundColor: colors.line, marginVertical: 8 },
-    tlRow: { flexDirection: "row", gap: 12 },
-    tlLeft: { alignItems: "center", width: 24 },
-    dotMark: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-    dotDone: { backgroundColor: colors.brand },
-    dotPending: { backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.line },
-    dotActive: { borderWidth: 3, borderColor: colors.brandSoft },
-    line: { width: 2, flex: 1, marginVertical: 2 },
-    lineDone: { backgroundColor: colors.brand },
-    linePending: { backgroundColor: colors.line },
-    tlTitle: { fontSize: 14.5, fontWeight: "700", color: colors.ink },
-    tlDate: { fontSize: 12.5, color: colors.muted, marginTop: 2 },
     empty: { flex: 1, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center", gap: 12 },
     emptyText: { fontSize: 14.5, color: colors.muted },
   });

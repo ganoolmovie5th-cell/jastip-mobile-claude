@@ -110,3 +110,12 @@ AppProvider (dark mode + bahasa)
 ## Yang tidak boleh di-commit
 
 `node_modules/`, `dist/`, `.expo/`, `ios/`, `android/` (hasil prebuild), `.preview/`.
+
+## Komponen Pesanan (Juni 2026 — dedup)
+
+Dua komponen reusable diekstrak dari duplikasi byte-per-byte antara `TrackScreen` dan `OrderDetailScreen`:
+
+- `src/components/StatusBadge.js` — `<StatusBadge status />`. Warna dari `orderStatusMeta` (bukan tema), jadi `StyleSheet` statis (aman dark/light).
+- `src/components/OrderTimeline.js` — `<OrderTimeline timeline currentStep />`. Dark-mode aware via `makeStyles(colors)` + `useMemo`.
+
+Jika butuh menampilkan badge status atau timeline pesanan di layar lain, pakai dua komponen ini, jangan menyalin ulang JSX/style-nya.
