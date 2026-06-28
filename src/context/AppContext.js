@@ -53,6 +53,7 @@ const strings = {
     "profile.whatsapp_btn": "Hubungi kami di WhatsApp",
     "profile.settings_title": "Pengaturan",
     "profile.dark_mode": "Mode gelap",
+    "profile.light_mode": "Mode terang",
     "profile.language": "Bahasa",
     "profile.version": "Jastipin v1.0.0",
     // Menu profil
@@ -120,6 +121,7 @@ const strings = {
     "profile.whatsapp_btn": "Contact us on WhatsApp",
     "profile.settings_title": "Settings",
     "profile.dark_mode": "Dark mode",
+    "profile.light_mode": "Light mode",
     "profile.language": "Language",
     "profile.version": "Jastipin v1.0.0",
     // Menu profil

@@ -122,7 +122,7 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.rowIcon}>
             <Ionicons name={isDarkMode ? "moon" : "sunny-outline"} size={19} color={colors.brand} />
           </View>
-          <Text style={styles.rowLabel}>{t("profile.dark_mode")}</Text>
+          <Text style={styles.rowLabel}>{t(isDarkMode ? "profile.dark_mode" : "profile.light_mode")}</Text>
           <Switch
             value={isDarkMode}
             onValueChange={toggleDarkMode}
