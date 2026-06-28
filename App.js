@@ -30,18 +30,13 @@ const Stack = createNativeStackNavigator();
 
 const ICONS = {
   Beranda: ["home", "home-outline"],
-  Home: ["home", "home-outline"],
   Kategori: ["grid", "grid-outline"],
-  Categories: ["grid", "grid-outline"],
   Lacak: ["navigate", "navigate-outline"],
-  Track: ["navigate", "navigate-outline"],
   Profil: ["person", "person-outline"],
-  Profile: ["person", "person-outline"],
 };
 
-function HomeStack() {
-  const { colors, t } = useAppTheme();
-  const screenOpts = {
+function makeScreenOpts(colors) {
+  return {
     headerStyle: { backgroundColor: colors.bg },
     headerShadowVisible: false,
     headerTintColor: colors.ink,
@@ -49,6 +44,11 @@ function HomeStack() {
     headerBackButtonDisplayMode: "generic",
     contentStyle: { backgroundColor: colors.bg },
   };
+}
+
+function HomeStack() {
+  const { colors, t } = useAppTheme();
+  const screenOpts = makeScreenOpts(colors);
   return (
     <Stack.Navigator screenOptions={screenOpts}>
       <Stack.Screen name="BerandaScreen" component={HomeScreen} options={{ headerShown: false }} />
@@ -63,14 +63,7 @@ function HomeStack() {
 
 function CategoriesStack() {
   const { colors, t } = useAppTheme();
-  const screenOpts = {
-    headerStyle: { backgroundColor: colors.bg },
-    headerShadowVisible: false,
-    headerTintColor: colors.ink,
-    headerTitleStyle: { fontWeight: "800" },
-    headerBackButtonDisplayMode: "generic",
-    contentStyle: { backgroundColor: colors.bg },
-  };
+  const screenOpts = makeScreenOpts(colors);
   return (
     <Stack.Navigator screenOptions={screenOpts}>
       <Stack.Screen name="CategoriesList" component={CategoriesScreen} options={{ title: t("nav.categories") }} />
@@ -85,14 +78,7 @@ function CategoriesStack() {
 
 function ProfileStack() {
   const { colors, t } = useAppTheme();
-  const screenOpts = {
-    headerStyle: { backgroundColor: colors.bg },
-    headerShadowVisible: false,
-    headerTintColor: colors.ink,
-    headerTitleStyle: { fontWeight: "800" },
-    headerBackButtonDisplayMode: "generic",
-    contentStyle: { backgroundColor: colors.bg },
-  };
+  const screenOpts = makeScreenOpts(colors);
   return (
     <Stack.Navigator screenOptions={screenOpts}>
       <Stack.Screen name="ProfileHome" component={ProfileScreen} options={{ headerShown: false }} />

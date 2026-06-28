@@ -113,3 +113,10 @@ npx expo export --platform android
 ```
 
 Harus selesai dengan "Exported: dist" tanpa error bundling.
+
+## Pembersihan Kode / Ponytail Audit (Juni 2026)
+
+Audit over-engineering — penghapusan aman, verifikasi `npx expo export --platform android` sukses:
+- **Dependency dihapus** (`package.json`): `expo-auth-session`, `expo-crypto` (auth di-hand-roll via `WebBrowser`+`fetch`, bukan AuthSession), `expo-dev-client` (tidak relevan untuk Expo Go `--go`). Jangan tambahkan kembali kecuali pindah ke dev build.
+- **`App.js`**: tiga objek `screenOpts` identik di HomeStack/CategoriesStack/ProfileStack → satu helper `makeScreenOpts(colors)`. Key ICONS Inggris (`Home`/`Categories`/`Track`/`Profile`) tak pernah match karena route bernama Indonesia (`Beranda`/`Kategori`/`Lacak`/`Profil`) → dihapus.
+- **`src/theme.js`**: `export const colors = lightColors` (alias dark-mode-unaware) 0 importer → dihapus. Semua komponen ambil warna dari `useAppTheme()`.

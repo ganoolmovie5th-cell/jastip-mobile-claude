@@ -159,3 +159,10 @@ Token warna dark mode ada di `src/theme.js` sebagai `darkColors`.
 - `StoreContext` punya simulator `setInterval(20 detik)` yang auto-advance pesanan aktif — ini sumber notifikasi yang muncul otomatis.
 - Transaksi tetap lewat WhatsApp sampai ada backend.
 - Untuk production, ganti OAuth ke EAS Build dengan native Google Sign-In.
+
+## Pembersihan Kode / Ponytail Audit (Juni 2026)
+
+Hapus over-engineering tanpa mengubah perilaku. Verifikasi `npx expo export --platform android` sukses ("Exported: dist"):
+- Lepas dependency tak terpakai: `expo-auth-session`, `expo-crypto` (auth di-hand-roll pakai `WebBrowser`+`fetch`), `expo-dev-client` (workflow Expo Go).
+- `App.js`: satukan `screenOpts` 3× → `makeScreenOpts(colors)`; buang key ICONS Inggris (`Home`/`Categories`/`Track`/`Profile`) yang tak match route Indonesia.
+- `src/theme.js`: hapus alias mati `export const colors = lightColors` (0 importer; semua pakai `useAppTheme`).

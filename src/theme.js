@@ -28,9 +28,6 @@ export const darkColors = {
   white: "#ffffff",
 };
 
-// Alias agar file yang belum dimigrasi tetap berjalan (selalu light)
-export const colors = lightColors;
-
 export const radius = {
   sm: 12,
   md: 18,
