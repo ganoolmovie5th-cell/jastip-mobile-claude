@@ -276,9 +276,8 @@ export const aboutContent = {
   version: "1.0.0",
 };
 
-export function formatRupiah(n) {
-  return "Rp" + n.toLocaleString("id-ID");
-}
+export const formatRupiah = (n) =>
+  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
 
 // Notifikasi awal (contoh), nyambung dengan data pesanan di seedOrders.
 const _now = Date.now();
