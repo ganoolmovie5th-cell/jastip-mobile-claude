@@ -120,3 +120,7 @@ Audit over-engineering — penghapusan aman, verifikasi `npx expo export --platf
 - **Dependency dihapus** (`package.json`): `expo-auth-session`, `expo-crypto` (auth di-hand-roll via `WebBrowser`+`fetch`, bukan AuthSession), `expo-dev-client` (tidak relevan untuk Expo Go `--go`). Jangan tambahkan kembali kecuali pindah ke dev build.
 - **`App.js`**: tiga objek `screenOpts` identik di HomeStack/CategoriesStack/ProfileStack → satu helper `makeScreenOpts(colors)`. Key ICONS Inggris (`Home`/`Categories`/`Track`/`Profile`) tak pernah match karena route bernama Indonesia (`Beranda`/`Kategori`/`Lacak`/`Profil`) → dihapus.
 - **`src/theme.js`**: `export const colors = lightColors` (alias dark-mode-unaware) 0 importer → dihapus. Semua komponen ambil warna dari `useAppTheme()`.
+
+## Ponytail Audit — Juli 2026
+
+- **`src/data.js` `formatRupiah`**: ganti implementasi manual `"Rp" + n.toLocaleString("id-ID")` → `Intl.NumberFormat("id-ID", { style:"currency", currency:"IDR", maximumFractionDigits:0 }).format(n)` — stdlib menangani simbol, pemisah, dan edge case secara benar.
