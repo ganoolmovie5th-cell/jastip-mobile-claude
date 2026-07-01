@@ -179,3 +179,13 @@ Verifikasi: `npx expo export --platform android` sukses ("Exported: dist").
 
 Merge efek storage yang tersebar. Verifikasi: `npx expo export --platform android` sukses.
 - `src/store/StoreContext.js`: merge 3 `useEffect` terpisah (addresses, payments, notifications masing-masing trigger `saveJSON`) → 1 `useEffect` gabungan; ketiganya disimpan setiap ada perubahan salah satu
+
+### Audit Lanjutan 2 (Juli 2026)
+
+Verifikasi: `npx expo export --platform android` sukses.
+- `src/store/StoreContext.js`: hapus `makeId()` → inline `Date.now().toString(36) + Math.random().toString(36).slice(2)` di 3 call site
+- `src/data.js`: hapus `paymentTypes` → inline sebagai `PAYMENT_TYPES` lokal di `PaymentScreen.js`; hapus `buildTimeline`, `statusForStep`, `orderTotal` → inline di `TrackScreen`, `OrderDetailScreen`, `StoreContext`
+- `src/storage.js`: hapus file — `loadJSON`/`saveJSON` wrapper tipis → `AsyncStorage.getItem`/`setItem` langsung di setiap context
+- `src/store/StoreContext.js`: merge `setDefaultAddress` + `setDefaultPayment` → `setDefault(type, id)` tunggal
+- `src/auth/AuthContext.js`: hapus `extractAccessToken()` → inline `URLSearchParams` di call site
+- `src/store/AppContext.js`: tambah `useApp()` composite hook (merge `useAuth` + `useAppTheme` + `useStore`); 10 screen diupdate pakai `useApp()` — screen single-context tetap pakai hook masing-masing
