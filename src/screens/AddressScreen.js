@@ -2,13 +2,11 @@ import React, { useMemo } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing, shadow } from "../theme";
-import { useAppTheme } from "../context/AppContext";
+import { useApp } from "../context/AppContext";
 import Button from "../components/Button";
-import { useStore } from "../store/StoreContext";
 
 export default function AddressScreen({ navigation }) {
-  const { addresses, removeAddress, setDefaultAddress } = useStore();
-  const { colors } = useAppTheme();
+  const { addresses, removeAddress, setDefault, colors } = useApp();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   function confirmDelete(addr) {
@@ -50,7 +48,7 @@ export default function AddressScreen({ navigation }) {
               <Text style={styles.detail}>{a.detail}, {a.city}, {a.province} {a.postal}</Text>
               <View style={styles.actions}>
                 {!a.isDefault ? (
-                  <Pressable style={styles.actionBtn} onPress={() => setDefaultAddress(a.id)}>
+                  <Pressable style={styles.actionBtn} onPress={() => setDefault("address", a.id)}>
                     <Ionicons name="checkmark-circle-outline" size={16} color={colors.brand} />
                     <Text style={styles.actionText}>Jadikan utama</Text>
                   </Pressable>

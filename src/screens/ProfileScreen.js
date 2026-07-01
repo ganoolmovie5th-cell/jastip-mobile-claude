@@ -12,10 +12,9 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing, shadow } from "../theme";
-import { useAppTheme } from "../context/AppContext";
+import { useApp } from "../context/AppContext";
 import Button from "../components/Button";
 import { openWhatsApp } from "../whatsapp";
-import { useAuth } from "../auth/AuthContext";
 
 function initialsOf(name = "") {
   const parts = name.trim().split(/\s+/).slice(0, 2);
@@ -24,8 +23,7 @@ function initialsOf(name = "") {
 
 export default function ProfileScreen({ navigation }) {
   const insets = useSafeAreaInsets();
-  const { user, isSignedIn, signOut } = useAuth();
-  const { colors, isDarkMode, toggleDarkMode, language, setLanguage, t } = useAppTheme();
+  const { user, isSignedIn, signOut, colors, isDarkMode, toggleDarkMode, language, setLanguage, t } = useApp();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const menuItems = [

@@ -151,29 +151,6 @@ export const orderStatusMeta = {
 // Total tahapan (dipakai progress bar di "Pesanan saya" dan timeline di "Lacak").
 export const ORDER_TOTAL_STEPS = ORDER_STAGES.length;
 
-// Tentukan status berdasarkan tahap saat ini.
-export function statusForStep(step) {
-  if (step >= ORDER_TOTAL_STEPS) return "selesai";
-  if (step <= 1) return "diproses";
-  return "dikirim";
-}
-
-// Bentuk timeline lengkap dari satu pesanan (status "done" dihitung dari currentStep).
-export function buildTimeline(order) {
-  if (!order) return [];
-  return ORDER_STAGES.map((title, i) => ({
-    id: i + 1,
-    title,
-    date: order.stageDates?.[i] || (i < order.currentStep ? "Selesai" : "Menunggu"),
-    done: i < order.currentStep,
-  }));
-}
-
-// Hitung total biaya satu pesanan.
-export function orderTotal(order) {
-  return order.itemPrice + order.serviceFee + order.shipping;
-}
-
 // Alamat awal (contoh). Pengguna bisa tambah / ubah / hapus, tersimpan di perangkat.
 export const seedAddresses = [
   {
@@ -187,14 +164,6 @@ export const seedAddresses = [
     postal: "40123",
     isDefault: true,
   },
-];
-
-// Tipe metode pembayaran yang bisa ditambahkan pengguna.
-export const paymentTypes = [
-  { id: "bank", label: "Transfer Bank", icon: "business-outline", hint: "BCA, Mandiri, BNI, BRI" },
-  { id: "ewallet", label: "E-Wallet", icon: "wallet-outline", hint: "GoPay, OVO, Dana, ShopeePay" },
-  { id: "va", label: "Virtual Account", icon: "card-outline", hint: "VA bank pilihan" },
-  { id: "qris", label: "QRIS", icon: "qr-code-outline", hint: "Scan untuk bayar" },
 ];
 
 // Metode pembayaran awal (contoh).

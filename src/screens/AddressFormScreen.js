@@ -2,9 +2,8 @@ import React, { useState, useLayoutEffect, useMemo } from "react";
 import { View, Text, ScrollView, StyleSheet, TextInput, Pressable, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing } from "../theme";
-import { useAppTheme } from "../context/AppContext";
+import { useApp } from "../context/AppContext";
 import Button from "../components/Button";
-import { useStore } from "../store/StoreContext";
 
 function Field({ label, value, onChangeText, placeholder, keyboardType, multiline, colors, styles }) {
   return (
@@ -25,8 +24,7 @@ function Field({ label, value, onChangeText, placeholder, keyboardType, multilin
 
 export default function AddressFormScreen({ route, navigation }) {
   const editing = route.params?.address || null;
-  const { upsertAddress } = useStore();
-  const { colors } = useAppTheme();
+  const { upsertAddress, colors } = useApp();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const [form, setForm] = useState({

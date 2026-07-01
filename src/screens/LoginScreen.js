@@ -3,13 +3,11 @@ import { View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-nati
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing, shadow } from "../theme";
-import { useAppTheme } from "../context/AppContext";
-import { useAuth } from "../auth/AuthContext";
+import { useApp } from "../context/AppContext";
 
 export default function LoginScreen({ navigation }) {
   const insets = useSafeAreaInsets();
-  const { signInWithGoogle, signingIn, isSignedIn } = useAuth();
-  const { colors, t } = useAppTheme();
+  const { signInWithGoogle, signingIn, isSignedIn, colors, t } = useApp();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const PERKS = [

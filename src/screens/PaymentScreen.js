@@ -2,18 +2,23 @@ import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable, Modal, TextInput, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing, shadow } from "../theme";
-import { useAppTheme } from "../context/AppContext";
+import { useApp } from "../context/AppContext";
 import Button from "../components/Button";
-import { useStore } from "../store/StoreContext";
-import { paymentTypes } from "../data";
+
+// ponytail: local const — was exported from data.js for only this one consumer
+const PAYMENT_TYPES = [
+  { id: "bank", label: "Transfer Bank", icon: "business-outline", hint: "BCA, Mandiri, BNI, BRI" },
+  { id: "ewallet", label: "E-Wallet", icon: "wallet-outline", hint: "GoPay, OVO, Dana, ShopeePay" },
+  { id: "va", label: "Virtual Account", icon: "card-outline", hint: "VA bank pilihan" },
+  { id: "qris", label: "QRIS", icon: "qr-code-outline", hint: "Scan untuk bayar" },
+];
 
 function typeMeta(typeId) {
-  return paymentTypes.find((t) => t.id === typeId) || paymentTypes[0];
+  return PAYMENT_TYPES.find((t) => t.id === typeId) || PAYMENT_TYPES[0];
 }
 
 export default function PaymentScreen() {
-  const { payments, addPayment, removePayment, setDefaultPayment } = useStore();
-  const { colors } = useAppTheme();
+  const { payments, addPayment, removePayment, setDefault, colors } = useApp();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const [modal, setModal] = useState(false);
@@ -52,7 +57,7 @@ export default function PaymentScreen() {
           payments.map((p) => {
             const meta = typeMeta(p.type);
             return (
-              <Pressable key={p.id} style={styles.card} onPress={() => setDefaultPayment(p.id)}>
+              <Pressable key={p.id} style={styles.card} onPress={() => setDefault("payment", p.id)}>
                 <View style={styles.icon}>
                   <Ionicons name={meta.icon} size={20} color={colors.brand} />
                 </View>
@@ -89,7 +94,7 @@ export default function PaymentScreen() {
 
             <Text style={styles.fieldLabel}>Jenis</Text>
             <View style={styles.typeGrid}>
-              {paymentTypes.map((t) => {
+              {PAYMENT_TYPES.map((t) => {
                 const active = type === t.id;
                 return (
                   <Pressable key={t.id} onPress={() => setType(t.id)} style={[styles.typeChip, active && styles.typeChipActive]}>

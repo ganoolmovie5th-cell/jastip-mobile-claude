@@ -2,12 +2,10 @@ import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing, shadow } from "../theme";
-import { useAppTheme } from "../context/AppContext";
-import { formatRupiah, ORDER_TOTAL_STEPS, orderTotal } from "../data";
+import { useApp } from "../context/AppContext";
+import { formatRupiah, ORDER_TOTAL_STEPS } from "../data";
 import Button from "../components/Button";
 import StatusBadge from "../components/StatusBadge";
-import { useAuth } from "../auth/AuthContext";
-import { useStore } from "../store/StoreContext";
 import { openWhatsApp } from "../whatsapp";
 
 const FILTERS = [
@@ -18,9 +16,7 @@ const FILTERS = [
 ];
 
 export default function OrdersScreen({ navigation }) {
-  const { isSignedIn } = useAuth();
-  const { orders } = useStore();
-  const { colors } = useAppTheme();
+  const { isSignedIn, orders, colors } = useApp();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [filter, setFilter] = useState("all");
 
@@ -71,7 +67,7 @@ export default function OrdersScreen({ navigation }) {
         </View>
       ) : (
         visibleOrders.map((o) => {
-          const total = orderTotal(o);
+          const total = o.itemPrice + o.serviceFee + o.shipping;
           return (
             <Pressable
               key={o.id}

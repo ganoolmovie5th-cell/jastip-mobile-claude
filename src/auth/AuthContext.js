@@ -7,7 +7,9 @@ import { Alert } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { GOOGLE_CLIENT_IDS, isGoogleConfigured } from "./googleConfig";
-import { loadJSON, saveJSON, removeKey, STORAGE_KEYS } from "../storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const USER_KEY = "jastipin.user";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -20,22 +22,6 @@ const AuthContext = createContext(null);
 // www, dan in-app browser bisa membuang fragment #access_token saat redirect.
 const CALLBACK_URL = "https://jastip-claude.vercel.app/callback.html";
 
-// Ambil access_token dari URL balikan, baik di query (?...) maupun fragment (#...).
-function extractAccessToken(url) {
-  if (!url) return null;
-  const tryParse = (str) => {
-    if (!str) return null;
-    try {
-      return new URLSearchParams(str).get("access_token");
-    } catch {
-      return null;
-    }
-  };
-  const hashPart  = url.includes("#") ? url.split("#")[1] : "";
-  const queryPart = url.includes("?") ? url.split("?")[1].split("#")[0] : "";
-  return tryParse(queryPart) || tryParse(hashPart);
-}
-
 export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,7 +32,7 @@ export function AuthProvider({ children }) {
   // Pulihkan sesi saat app dibuka
   useEffect(() => {
     (async () => {
-      const saved = await loadJSON(STORAGE_KEYS.user, null);
+      const saved = JSON.parse(await AsyncStorage.getItem(USER_KEY) ?? "null");
       if (saved) setUser(saved);
       setLoading(false);
     })();
@@ -67,7 +53,7 @@ export function AuthProvider({ children }) {
         signedInAt:  new Date().toISOString(),
       };
       setUser(next);
-      await saveJSON(STORAGE_KEYS.user, next);
+      await AsyncStorage.setItem(USER_KEY, JSON.stringify(next));
     } catch {
       Alert.alert("Login gagal", "Tidak bisa mengambil profil Google. Coba lagi ya.");
     } finally {
@@ -105,7 +91,7 @@ export function AuthProvider({ children }) {
       if (result.type === "success" && result.url) {
         // result.url bisa berbentuk exp://IP:PORT?access_token=xxx
         // atau exp://IP:PORT#access_token=xxx — ambil token dari keduanya.
-        const token = extractAccessToken(result.url);
+        const token = new URLSearchParams(result.url.split("#")[1] || result.url.split("?")[1] || "").get("access_token");
         if (token) {
           await fetchProfile(token);
           return;
@@ -134,7 +120,7 @@ export function AuthProvider({ children }) {
 
   const signOut = useCallback(async () => {
     setUser(null);
-    await removeKey(STORAGE_KEYS.user);
+    await AsyncStorage.removeItem(USER_KEY);
   }, []);
 
   return (

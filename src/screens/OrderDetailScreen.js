@@ -2,19 +2,27 @@ import React, { useMemo } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing, shadow } from "../theme";
-import { useAppTheme } from "../context/AppContext";
-import { buildTimeline, orderTotal, formatRupiah } from "../data";
-import { useStore } from "../store/StoreContext";
+import { useApp } from "../context/AppContext";
+import { ORDER_STAGES, formatRupiah } from "../data";
 import Button from "../components/Button";
 import StatusBadge from "../components/StatusBadge";
 import OrderTimeline from "../components/OrderTimeline";
 import { openWhatsApp } from "../whatsapp";
 
 export default function OrderDetailScreen({ route, navigation }) {
-  const { findOrder } = useStore();
+  const { findOrder, colors } = useApp();
   const order = findOrder(route.params?.orderId);
-  const timeline = useMemo(() => buildTimeline(order), [order]);
-  const { colors } = useAppTheme();
+  const timeline = useMemo(
+    () => order
+      ? ORDER_STAGES.map((title, i) => ({
+          id: i + 1,
+          title,
+          date: order.stageDates?.[i] || (i < order.currentStep ? "Selesai" : "Menunggu"),
+          done: i < order.currentStep,
+        }))
+      : [],
+    [order]
+  );
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   if (!order) {
@@ -60,7 +68,7 @@ export default function OrderDetailScreen({ route, navigation }) {
         <CostRow label="Biaya titip" value={formatRupiah(order.serviceFee)} colors={colors} styles={styles} />
         <CostRow label="Ongkir" value={formatRupiah(order.shipping)} colors={colors} styles={styles} />
         <View style={styles.divider} />
-        <CostRow label="Total" value={formatRupiah(orderTotal(order))} strong colors={colors} styles={styles} />
+        <CostRow label="Total" value={formatRupiah(order.itemPrice + order.serviceFee + order.shipping)} strong colors={colors} styles={styles} />
       </View>
 
       {/* Timeline */}

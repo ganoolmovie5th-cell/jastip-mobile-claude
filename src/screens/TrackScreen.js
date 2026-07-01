@@ -3,16 +3,14 @@ import { View, Text, ScrollView, StyleSheet, TextInput, Pressable } from "react-
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing, shadow } from "../theme";
-import { useAppTheme } from "../context/AppContext";
-import { buildTimeline, orderTotal, formatRupiah } from "../data";
-import { useStore } from "../store/StoreContext";
+import { useApp } from "../context/AppContext";
+import { ORDER_STAGES, formatRupiah } from "../data";
 import StatusBadge from "../components/StatusBadge";
 import OrderTimeline from "../components/OrderTimeline";
 
 export default function TrackScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
-  const { orders, findOrder } = useStore();
-  const { colors, t } = useAppTheme();
+  const { orders, findOrder, colors, t } = useApp();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const initialId =
@@ -28,7 +26,17 @@ export default function TrackScreen({ route, navigation }) {
   }, [route.params?.orderId]);
 
   const order = findOrder(selectedId);
-  const timeline = useMemo(() => buildTimeline(order), [order]);
+  const timeline = useMemo(
+    () => order
+      ? ORDER_STAGES.map((title, i) => ({
+          id: i + 1,
+          title,
+          date: order.stageDates?.[i] || (i < order.currentStep ? "Selesai" : "Menunggu"),
+          done: i < order.currentStep,
+        }))
+      : [],
+    [order]
+  );
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -123,7 +131,7 @@ export default function TrackScreen({ route, navigation }) {
 
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>{t("track.total")}</Text>
-            <Text style={styles.totalValue}>{formatRupiah(orderTotal(order))}</Text>
+            <Text style={styles.totalValue}>{formatRupiah(order.itemPrice + order.serviceFee + order.shipping)}</Text>
           </View>
         </View>
       )}

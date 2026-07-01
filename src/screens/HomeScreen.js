@@ -14,19 +14,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
 import { radius, spacing, shadow } from "../theme";
-import { useAppTheme } from "../context/AppContext";
+import { useApp } from "../context/AppContext";
 import { categories, steps, aboutContent, testimonial } from "../data";
 import Button from "../components/Button";
 import SectionHeader from "../components/SectionHeader";
 import { openWhatsApp } from "../whatsapp";
-import { useAuth } from "../auth/AuthContext";
-import { useStore } from "../store/StoreContext";
 
 export default function HomeScreen({ navigation }) {
   const insets = useSafeAreaInsets();
-  const { isSignedIn, user, signInWithGoogle, signingIn } = useAuth();
-  const { unreadCount } = useStore();
-  const { colors, t } = useAppTheme();
+  const { isSignedIn, user, signInWithGoogle, signingIn, unreadCount, colors, t } = useApp();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const [searchQuery, setSearchQuery] = useState("");

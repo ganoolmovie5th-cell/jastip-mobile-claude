@@ -2,8 +2,7 @@ import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing, shadow } from "../theme";
-import { useAppTheme } from "../context/AppContext";
-import { useStore } from "../store/StoreContext";
+import { useApp } from "../context/AppContext";
 
 const FILTERS = [
   { id: "all", label: "Semua" },
@@ -13,8 +12,7 @@ const FILTERS = [
 ];
 
 export default function NotificationsScreen({ navigation }) {
-  const { notifications, unreadCount, markNotificationRead, markAllNotificationsRead } = useStore();
-  const { colors } = useAppTheme();
+  const { notifications, unreadCount, markNotificationRead, markAllNotificationsRead, colors } = useApp();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const [filter, setFilter] = useState("all");

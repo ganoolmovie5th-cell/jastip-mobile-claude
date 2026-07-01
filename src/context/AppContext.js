@@ -2,8 +2,10 @@
 // Preferensi disimpan lokal di AsyncStorage agar persisten antar sesi.
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
-import { loadJSON, saveJSON, STORAGE_KEYS } from "../storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { lightColors, darkColors } from "../theme";
+
+const APP_SETTINGS_KEY = "jastipin.app_settings";
 
 // ---------------------------------------------------------------------------
 // Teks terjemahan
@@ -160,7 +162,7 @@ export function AppProvider({ children }) {
   // Muat preferensi tersimpan saat pertama buka
   useEffect(() => {
     (async () => {
-      const saved = await loadJSON(STORAGE_KEYS.appSettings, null);
+      const saved = JSON.parse(await AsyncStorage.getItem(APP_SETTINGS_KEY) ?? "null");
       if (saved) {
         setIsDarkMode(!!saved.isDarkMode);
         setLanguageState(saved.language === "en" ? "en" : "id");
@@ -170,7 +172,7 @@ export function AppProvider({ children }) {
   }, []);
 
   const persist = useCallback(async (dark, lang) => {
-    await saveJSON(STORAGE_KEYS.appSettings, { isDarkMode: dark, language: lang });
+    await AsyncStorage.setItem(APP_SETTINGS_KEY, JSON.stringify({ isDarkMode: dark, language: lang }));
   }, []);
 
   const toggleDarkMode = useCallback(() => {
@@ -215,4 +217,13 @@ export function useAppTheme() {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useAppTheme harus dipakai di dalam AppProvider");
   return ctx;
+}
+
+// ponytail: composite hook — calls each context separately so providers stay
+// isolated and re-render scopes don't bleed across auth/theme/store changes.
+export function useApp() {
+  // Lazy imports avoid circular deps at module load time
+  const { useAuth } = require("../auth/AuthContext");
+  const { useStore } = require("../store/StoreContext");
+  return { ...useAuth(), ...useAppTheme(), ...useStore() };
 }

@@ -4,7 +4,7 @@
 // simulasi update real-time selalu segar. Tanpa backend.
 
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
-import { loadJSON, saveJSON, STORAGE_KEYS } from "../storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   seedAddresses,
   seedPayments,
@@ -12,19 +12,20 @@ import {
   seedOrders,
   ORDER_STAGES,
   ORDER_TOTAL_STEPS,
-  statusForStep,
   orderStatusMeta,
 } from "../data";
+
+const STORAGE_KEYS = {
+  addresses: "jastipin.addresses",
+  payments: "jastipin.payments",
+  notifications: "jastipin.notifications",
+};
 
 const StoreContext = createContext(null);
 
 // Seberapa sering status pesanan maju satu tahap (simulasi real-time).
 const SIM_INTERVAL_MS = 20000;
 const MAX_NOTIFICATIONS = 50;
-
-function makeId(prefix) {
-  return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-}
 
 export function StoreProvider({ children }) {
   const [orders, setOrders] = useState(seedOrders);
@@ -35,9 +36,9 @@ export function StoreProvider({ children }) {
 
   useEffect(() => {
     (async () => {
-      const a = await loadJSON(STORAGE_KEYS.addresses, null);
-      const p = await loadJSON(STORAGE_KEYS.payments, null);
-      const n = await loadJSON(STORAGE_KEYS.notifications, null);
+      const a = JSON.parse(await AsyncStorage.getItem(STORAGE_KEYS.addresses) ?? "null");
+      const p = JSON.parse(await AsyncStorage.getItem(STORAGE_KEYS.payments) ?? "null");
+      const n = JSON.parse(await AsyncStorage.getItem(STORAGE_KEYS.notifications) ?? "null");
       setAddresses(a ?? seedAddresses);
       setPayments(p ?? seedPayments);
       setNotifications(n ?? seedNotifications);
@@ -47,15 +48,15 @@ export function StoreProvider({ children }) {
 
   useEffect(() => {
     if (!ready) return;
-    saveJSON(STORAGE_KEYS.addresses, addresses);
-    saveJSON(STORAGE_KEYS.payments, payments);
-    saveJSON(STORAGE_KEYS.notifications, notifications);
+    AsyncStorage.setItem(STORAGE_KEYS.addresses, JSON.stringify(addresses));
+    AsyncStorage.setItem(STORAGE_KEYS.payments, JSON.stringify(payments));
+    AsyncStorage.setItem(STORAGE_KEYS.notifications, JSON.stringify(notifications));
   }, [addresses, payments, notifications, ready]);
 
   // ----- Notifikasi -----
   const addNotification = useCallback((n) => {
     setNotifications((prev) =>
-      [{ id: makeId("n"), read: false, ts: Date.now(), time: "Baru saja", ...n }, ...prev].slice(0, MAX_NOTIFICATIONS)
+      [{ id: Date.now().toString(36) + Math.random().toString(36).slice(2), read: false, ts: Date.now(), time: "Baru saja", ...n }, ...prev].slice(0, MAX_NOTIFICATIONS)
     );
   }, []);
 
@@ -83,7 +84,7 @@ export function StoreProvider({ children }) {
       const target = ordersRef.current.find((o) => o.id === id);
       if (!target || target.currentStep >= ORDER_TOTAL_STEPS) return;
       const nextStep = target.currentStep + 1;
-      const newStatus = statusForStep(nextStep);
+      const newStatus = nextStep >= ORDER_TOTAL_STEPS ? "selesai" : nextStep <= 1 ? "diproses" : "dikirim";
       const stageTitle = ORDER_STAGES[nextStep - 1];
       setOrders((prev) =>
         prev.map((o) =>
@@ -121,7 +122,7 @@ export function StoreProvider({ children }) {
       if (exists) {
         next = prev.map((x) => (x.id === addr.id ? { ...x, ...addr } : x));
       } else {
-        next = [...prev, { ...addr, id: makeId("addr") }];
+        next = [...prev, { ...addr, id: Date.now().toString(36) + Math.random().toString(36).slice(2) }];
       }
       if (addr.isDefault) {
         next = next.map((x) => ({ ...x, isDefault: x.id === (addr.id || next[next.length - 1].id) }));
@@ -139,15 +140,17 @@ export function StoreProvider({ children }) {
     });
   }, []);
 
-  const setDefaultAddress = useCallback((id) => {
-    setAddresses((prev) => prev.map((x) => ({ ...x, isDefault: x.id === id })));
+  // ponytail: merged setDefaultAddress + setDefaultPayment — identical shape
+  const setDefault = useCallback((type, id) => {
+    const setter = type === "address" ? setAddresses : setPayments;
+    setter((prev) => prev.map((x) => ({ ...x, isDefault: x.id === id })));
   }, []);
 
   // ----- Pembayaran -----
   const addPayment = useCallback((pay) => {
     setPayments((prev) => {
       const makeDefault = prev.length === 0 || pay.isDefault;
-      let next = [...prev, { ...pay, id: makeId("pay"), isDefault: !!makeDefault }];
+      let next = [...prev, { ...pay, id: Date.now().toString(36) + Math.random().toString(36).slice(2), isDefault: !!makeDefault }];
       if (makeDefault) next = next.map((x) => ({ ...x, isDefault: x.id === next[next.length - 1].id }));
       return next;
     });
@@ -159,10 +162,6 @@ export function StoreProvider({ children }) {
       if (!next.some((x) => x.isDefault) && next.length) next[0].isDefault = true;
       return next;
     });
-  }, []);
-
-  const setDefaultPayment = useCallback((id) => {
-    setPayments((prev) => prev.map((x) => ({ ...x, isDefault: x.id === id })));
   }, []);
 
   const value = {
@@ -179,10 +178,9 @@ export function StoreProvider({ children }) {
     markAllNotificationsRead,
     upsertAddress,
     removeAddress,
-    setDefaultAddress,
+    setDefault,
     addPayment,
     removePayment,
-    setDefaultPayment,
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
