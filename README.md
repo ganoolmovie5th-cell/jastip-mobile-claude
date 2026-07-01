@@ -174,3 +174,8 @@ Timeline pengiriman & badge status yang sebelumnya disalin identik di `TrackScre
 - `src/components/OrderTimeline.js`
 
 Verifikasi: `npx expo export --platform android` sukses ("Exported: dist").
+
+## Pembersihan Kode / Ponytail Audit (Juli 2026)
+
+Merge efek storage yang tersebar. Verifikasi: `npx expo export --platform android` sukses.
+- `src/store/StoreContext.js`: merge 3 `useEffect` terpisah (addresses, payments, notifications masing-masing trigger `saveJSON`) → 1 `useEffect` gabungan; ketiganya disimpan setiap ada perubahan salah satu
