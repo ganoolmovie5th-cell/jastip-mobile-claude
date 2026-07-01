@@ -54,12 +54,6 @@ export const steps = [
   { id: "4", title: "Diantar ke rumah", desc: "Dikemas rapi dengan resi yang bisa dilacak." },
 ];
 
-export const stats = [
-  { label: "Negara asal", value: "38" },
-  { label: "Pesanan", value: "52rb+" },
-  { label: "Rating", value: "4,9" },
-];
-
 export const testimonial = {
   quote:
     "Pesan toner yang selalu sold out, dikabarin tiap tahap. Sampai dalam 9 hari, packing rapi banget.",

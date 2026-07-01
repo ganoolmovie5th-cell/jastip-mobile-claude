@@ -3,8 +3,9 @@ import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { radius, spacing, shadow } from "../theme";
 import { useAppTheme } from "../context/AppContext";
-import { orderStatusMeta, formatRupiah, ORDER_TOTAL_STEPS, orderTotal } from "../data";
+import { formatRupiah, ORDER_TOTAL_STEPS, orderTotal } from "../data";
 import Button from "../components/Button";
+import StatusBadge from "../components/StatusBadge";
 import { useAuth } from "../auth/AuthContext";
 import { useStore } from "../store/StoreContext";
 import { openWhatsApp } from "../whatsapp";
@@ -71,7 +72,6 @@ export default function OrdersScreen({ navigation }) {
       ) : (
         visibleOrders.map((o) => {
           const total = orderTotal(o);
-          const meta = orderStatusMeta[o.status] || orderStatusMeta.diproses;
           return (
             <Pressable
               key={o.id}
@@ -80,10 +80,7 @@ export default function OrdersScreen({ navigation }) {
             >
               <View style={styles.cardTop}>
                 <Text style={styles.code}>{o.id}</Text>
-                <View style={[styles.badge, { backgroundColor: meta.soft }]}>
-                  <Ionicons name={meta.icon} size={13} color={meta.color} />
-                  <Text style={[styles.badgeText, { color: meta.color }]}>{meta.label}</Text>
-                </View>
+                <StatusBadge status={o.status} />
               </View>
               <Text style={styles.item}>{o.item}</Text>
               <View style={styles.metaRow}>
@@ -164,8 +161,6 @@ function makeStyles(colors) {
     },
     cardTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
     code: { fontSize: 13, fontWeight: "700", color: colors.muted, letterSpacing: 0.3 },
-    badge: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: radius.pill },
-    badgeText: { fontSize: 12, fontWeight: "700" },
     item: { fontSize: 16, fontWeight: "800", color: colors.ink, marginTop: 8 },
     metaRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6, flexWrap: "wrap" },
     meta: { fontSize: 12.5, color: colors.muted },

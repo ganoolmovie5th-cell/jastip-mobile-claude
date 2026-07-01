@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { radius, spacing, shadow } from "../theme";
 import { useAppTheme } from "../context/AppContext";
-import { categories, steps, stats, testimonial } from "../data";
+import { categories, steps, aboutContent, testimonial } from "../data";
 import Button from "../components/Button";
 import SectionHeader from "../components/SectionHeader";
 import { openWhatsApp } from "../whatsapp";
@@ -167,8 +167,8 @@ export default function HomeScreen({ navigation }) {
 
           {/* Stats */}
           <View style={[styles.pad, styles.statsRow]}>
-            {stats.map((s, i) => (
-              <View key={s.label} style={[styles.stat, i < stats.length - 1 && styles.statDivider]}>
+            {aboutContent.stats.map((s, i) => (
+              <View key={s.label} style={[styles.stat, i < aboutContent.stats.length - 1 && styles.statDivider]}>
                 <Text style={styles.statValue}>{s.value}</Text>
                 <Text style={styles.statLabel}>{s.label}</Text>
               </View>

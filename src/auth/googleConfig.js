@@ -18,9 +18,5 @@ export const GOOGLE_CLIENT_IDS = {
   ios: "524436876503-q4gmv41p02sef3nk1rvtcoa91lfa8o34.apps.googleusercontent.com",
 };
 
-// True kalau minimal satu client ID sudah benar-benar diisi.
-export function isGoogleConfigured() {
-  return Object.values(GOOGLE_CLIENT_IDS).some(
-    (v) => typeof v === "string" && v.length > 0 && !v.startsWith("YOUR_")
-  );
-}
+// ponytail: IDs are real, check is always true now.
+export const isGoogleConfigured = () => true;

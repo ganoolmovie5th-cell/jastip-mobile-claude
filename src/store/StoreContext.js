@@ -46,14 +46,11 @@ export function StoreProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (ready) saveJSON(STORAGE_KEYS.addresses, addresses);
-  }, [addresses, ready]);
-  useEffect(() => {
-    if (ready) saveJSON(STORAGE_KEYS.payments, payments);
-  }, [payments, ready]);
-  useEffect(() => {
-    if (ready) saveJSON(STORAGE_KEYS.notifications, notifications);
-  }, [notifications, ready]);
+    if (!ready) return;
+    saveJSON(STORAGE_KEYS.addresses, addresses);
+    saveJSON(STORAGE_KEYS.payments, payments);
+    saveJSON(STORAGE_KEYS.notifications, notifications);
+  }, [addresses, payments, notifications, ready]);
 
   // ----- Notifikasi -----
   const addNotification = useCallback((n) => {
