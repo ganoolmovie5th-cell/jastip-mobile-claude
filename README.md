@@ -189,3 +189,8 @@ Verifikasi: `npx expo export --platform android` sukses.
 - `src/store/StoreContext.js`: merge `setDefaultAddress` + `setDefaultPayment` → `setDefault(type, id)` tunggal
 - `src/auth/AuthContext.js`: hapus `extractAccessToken()` → inline `URLSearchParams` di call site
 - `src/store/AppContext.js`: tambah `useApp()` composite hook (merge `useAuth` + `useAppTheme` + `useStore`); 10 screen diupdate pakai `useApp()` — screen single-context tetap pakai hook masing-masing
+
+### Audit Lanjutan 3 (Juli 2026)
+
+- `src/data.js`: hapus `profileMenu` export (zero importer)
+- `src/auth/googleConfig.js`: hapus `isGoogleConfigured()` — always returns true; inline `const configured = true` di `AuthContext.js` langsung
