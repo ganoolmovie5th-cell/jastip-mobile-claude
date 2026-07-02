@@ -6,7 +6,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { Alert } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
-import { GOOGLE_CLIENT_IDS, isGoogleConfigured } from "./googleConfig";
+import { GOOGLE_CLIENT_IDS } from "./googleConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const USER_KEY = "jastipin.user";
@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
 
-  const configured = isGoogleConfigured();
+  const configured = true;
 
   // Pulihkan sesi saat app dibuka
   useEffect(() => {

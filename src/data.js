@@ -71,14 +71,6 @@ export const ORDER_STAGES = [
   "Diantar ke alamat kamu",
 ];
 
-export const profileMenu = [
-  { id: "orders", label: "Pesanan saya", icon: "bag-handle-outline", route: "Orders" },
-  { id: "address", label: "Alamat pengiriman", icon: "location-outline", route: "Address" },
-  { id: "payment", label: "Metode pembayaran", icon: "card-outline", route: "Payment" },
-  { id: "help", label: "Bantuan & FAQ", icon: "help-circle-outline", route: "Help" },
-  { id: "about", label: "Tentang Jastipin", icon: "information-circle-outline", route: "About" },
-];
-
 // Sumber data pesanan awal (di-seed ke StoreContext, lalu jadi state hidup).
 // Status: diproses | dikirim | selesai | dibatalkan
 // stageDates sejajar dengan ORDER_STAGES; status "done" dihitung dari currentStep.

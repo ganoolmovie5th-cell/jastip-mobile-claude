@@ -17,6 +17,3 @@ export const GOOGLE_CLIENT_IDS = {
   android: "524436876503-2ml79rghoaqc8n9t5ofjcemntb9rpb5o.apps.googleusercontent.com",
   ios: "524436876503-q4gmv41p02sef3nk1rvtcoa91lfa8o34.apps.googleusercontent.com",
 };
-
-// ponytail: IDs are real, check is always true now.
-export const isGoogleConfigured = () => true;
