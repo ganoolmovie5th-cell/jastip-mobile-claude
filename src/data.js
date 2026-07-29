@@ -226,7 +226,7 @@ export const aboutContent = {
   links: [
     { id: "ig", label: "Instagram", icon: "logo-instagram", url: "https://instagram.com", disabled: true },
     { id: "tiktok", label: "TikTok", icon: "logo-tiktok", url: "https://tiktok.com", disabled: true },
-    { id: "web", label: "Website", icon: "globe-outline", url: "https://jastip-in.web.id/" },
+    { id: "web", label: "Website", icon: "globe-outline", url: "https://www.jastip-in.web.id/" },
   ],
   version: "1.0.0",
 };
