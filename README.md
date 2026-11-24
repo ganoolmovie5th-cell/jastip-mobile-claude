@@ -2,7 +2,7 @@
 
 Aplikasi mobile untuk layanan jasa titip (jastip) belanja. Versi mobile dari situs web Jastipin, dengan penekanan pada kepercayaan dan transparansi.
 
-**Tech Stack:** React Native · Expo SDK 54 · React Navigation 7 · AsyncStorage
+**Tech Stack:** React Native · Expo SDK 58 · React Navigation 7 · AsyncStorage
 
 ## Features
 

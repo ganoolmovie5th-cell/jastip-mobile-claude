@@ -11,11 +11,6 @@
       "id.jastipin.app"
     ],
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0f5c4a"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -34,7 +29,17 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-web-browser"
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0f5c4a"
+        }
+      ],
+      "expo-web-browser",
+      "expo-status-bar",
+      "expo-font"
     ]
   }
 }
