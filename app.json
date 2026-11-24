@@ -40,6 +40,17 @@
       "expo-web-browser",
       "expo-status-bar",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "17acfcef-663a-4e17-a9f3-781ff5551499"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/17acfcef-663a-4e17-a9f3-781ff5551499"
+    }
   }
 }
